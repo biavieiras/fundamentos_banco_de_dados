@@ -1,8 +1,10 @@
-2) 
+2
 As tabelas referentes aos conjuntos de playlists, faixas e de relacionamento entre
 as duas devem ser alocadas no filegroup (tablespace), definido com apenas um
 arquivo. As outras tabelas devem ser alocadas no filegroup com dois arquivos.
 
+nome: nvarchar(50)
+endereço: not null
 
 ** OBS:
 
