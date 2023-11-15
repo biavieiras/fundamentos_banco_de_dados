@@ -145,6 +145,7 @@ references faixa (num_faixa)
 
 
 --gui
+
 create table gravadora
 (
 cod_gravad smallint not null,
@@ -156,24 +157,25 @@ end_site varchar(200)
 
 CONSTRAINT gravadora_PK primary key (cod_gravad)
 
-) on spotper_fg02
+) 
+
 
 
 create table telefone 
 (
     fone varchar(10) not null,
-    tipo_fone varchar(50) not null 
+    tipo_fone varchar(50) not null ,
     cod_gravadora smallint not null,
     
-    CONSTRAINT fone_PK PRIMARY KEY (fone)
+    CONSTRAINT fone_PK PRIMARY KEY (fone),
 
-    CONSTRAINT telefone_CK CHECK (tipo_telefone IN ('celular', 'fixo'))
+    CONSTRAINT telefone_CK CHECK (tipo_fone IN ('celular', 'fixo')),
     
     CONSTRAINT telefone_FK_gravadora FOREIGN KEY (cod_gravadora)
     REFERENCES gravadora (cod_gravad)  ON UPDATE cascade ON DELETE CASCADE
 
     
-) on spotper_fg02
+)
 
 
 create table album
@@ -185,12 +187,20 @@ create table album
     pr_compra decimal(7,2) not null,
     dt_compra date not null,
     dt_gravacao date not null,
-    
+    cod_gravadora smallint not null,
 
-    CONSTRAINT cod_album_PK PRIMARY KEY (cod_album)
+    CONSTRAINT cod_album_PK PRIMARY KEY (cod_album),
+      
+	  -- Talvez seja melhor criar um gatilho para esse check
+    CONSTRAINT album_CK_faixas CHECK ((SELECT COUNT(num_faixa) from Faixa ) <= 64),
 
+	CONSTRAINT album_FK_gravadora FOREIGN KEY (cod_gravadora)
+    REFERENCES gravadora (cod_gravad)  ON UPDATE cascade ON DELETE NO ACTION,
 
-) on spotper_fg02
+-- Provavelemente errado
+	CONSTRAINT data_gravacao_CK CHECK  (dt_gravacao> '2000-01-01')
+
+) 
 
 
 
