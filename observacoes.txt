@@ -1,0 +1,41 @@
+2) 
+As tabelas referentes aos conjuntos de playlists, faixas e de relacionamento entre
+as duas devem ser alocadas no filegroup (tablespace), definido com apenas um
+arquivo. As outras tabelas devem ser alocadas no filegroup com dois arquivos.
+
+
+** OBS:
+
+ 1. A data de gravação deve ser obrigatoriamente posterior a 01.01.2000. 
+
+ 2. Quando o meio físico de armazenamento é CD, o tipo de gravação tem que
+ser ADD ou DDD. Quando o meio físico de armazenamento é vinil ou
+download, o tipo de gravação não terá valor algum.
+
+3. Para cada tipo de composição, devem estar associados um código
+identificador e a descrição. O tipo deve caracterizar se a obra gravada é uma
+sinfonia, ópera, sonata, concerto e assim por diante. É obrigatório identificar o
+tipo de composição para cada faixa existente. Uma faixa só pode apresentar
+um tipo de composição
+
+4.  Tipo de intérprete:
+pode ser orquestra, trio, quarteto, ensemble, soprano, tenor, etc...
+
+
+5. Podem existir compositores no banco de dados, sem estarem associados a faixas. 
+
+6. Cada período musical possuirá um código, uma descrição (idade média,
+renascença, barroco, clássico, romântico e moderno) 
+
+7. Um álbum, com faixas de músicas do período barroco, só pode ser inserido no
+banco de dados, caso o tipo de gravação seja DDD.
+
+8. Um álbum não pode ter mais que 64 faixas (músicas).
+
+9. No caso de remoção de um álbum do banco de dados, todas as suas faixas
+devem ser removidas. Lembre-se que faixas podem apresentar, por sua vez,
+outros relacionamentos.
+
+10. O preço de compra de um álbum não dever ser superior a três vezes a média
+do preço de compra de álbuns, com todas as faixas com tipo de gravação
+DDD.

@@ -1,0 +1,6 @@
+
+Dúvidas para serem tiradas com o prof:
+
+1. Tabelas auxiliares criadas para relacionamentos N:N, que 
+têm particiação parcial, podem ter as chaves primárias nulas?
+Ou deve-se criar uma terceira chave primária?
