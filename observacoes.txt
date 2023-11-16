@@ -41,3 +41,4 @@ outros relacionamentos.
 10. O preço de compra de um álbum não dever ser superior a três vezes a média
 do preço de compra de álbuns, com todas as faixas com tipo de gravação
 DDD.
+
