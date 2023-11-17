@@ -12,4 +12,6 @@ Ou deve-se criar uma terceira chave primária?
 4. As tabelas Album, Faixa, Composição podem o atributo nome, mesmo não
 sendo especificado na descrição do trabalho?
 
+5. Deve haver um check em interprete e composição para os tipos?
 
+6. Como fica as foreign keys entre os meios físicos e meio_faixa

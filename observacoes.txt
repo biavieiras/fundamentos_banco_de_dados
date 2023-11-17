@@ -8,20 +8,20 @@ endereço: not null
 
 ** OBS:
 
- 1. A data de gravação deve ser obrigatoriamente posterior a 01.01.2000. 
+ 1. A data de gravação deve ser obrigatoriamente posterior a 01.01.2000. (FEITO)
 
  2. Quando o meio físico de armazenamento é CD, o tipo de gravação tem que
 ser ADD ou DDD. Quando o meio físico de armazenamento é vinil ou
-download, o tipo de gravação não terá valor algum.
+download, o tipo de gravação não terá valor algum. 
 
 3. Para cada tipo de composição, devem estar associados um código
 identificador e a descrição. O tipo deve caracterizar se a obra gravada é uma
 sinfonia, ópera, sonata, concerto e assim por diante. É obrigatório identificar o
 tipo de composição para cada faixa existente. Uma faixa só pode apresentar
-um tipo de composição
+um tipo de composição. (FEITO) 
 
 4.  Tipo de intérprete:
-pode ser orquestra, trio, quarteto, ensemble, soprano, tenor, etc...
+pode ser orquestra, trio, quarteto, ensemble, soprano, tenor, etc... FEITO
 
 
 5. Podem existir compositores no banco de dados, sem estarem associados a faixas. 
