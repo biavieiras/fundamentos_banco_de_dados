@@ -12,7 +12,7 @@ create table playlist
 	nome_playlist nvarchar(50) not null,
 	dt_criacao date not null,
 	----provavelmente errado-------
-	tempo_exec dec(10,10),
+	tempo_exec varchar(10),
 	----------------------------
 	constraint PK_playlist primary key (cod_playlist)
 ) on spotper_fg01
@@ -28,7 +28,7 @@ create table compositor
 	cidade_nasc nvarchar(10),
 	pais_nasc nvarchar(10),
 	constraint PK_compositor primary key (cod_compositor),
-	constraint FK_compositor (cod_periodo_mus) references periodo_musical (cod_pm) on delete no action on update cascade
+	constraint FK_compositor foreign key (cod_periodo_mus) references periodo_musical (cod_pm) on delete no action on update cascade
 ) on spotper_fg02
 
 --bia
@@ -43,26 +43,6 @@ create table periodo_musical
 ) on spotper_fg02
 
 --bruna
-create table faixa
-(
-num_faixa int not null,
-descricao_faixa nvarchar(100) not null,
-tipo_gravacao nvarchar(3) not null,
-dt_ult_tocada date not null,
-vezes_tocada smallint not null,
-tempo_execucao int not null, /*analisar o tipo de dado*/
-codigo_composicao smallint not null,
-codigo_album smallint not null
-
-constraint PK_num_faixa primary key(num_faixa),
-
-constraint FK_cod_composicao foreign key(codigo_composicao) references composicao(cod_composicao)
-on delete cascade on update cascade, /*analisar o on delete cascade*/
-
-constraint FK_cod_album foreign key(codigo_album) references album(cod_album)
-on delete cascade on update cascade
-
-) on spotper_fg01
 
 --bia
 create table faixa_compositor
@@ -131,18 +111,7 @@ references faixa (num_faixa)
 ) on spotper_fg02
 
 
-/*
---bruna
-create table meio_faixa
-(
-	id_meio_fis smallint not null,
-	numero_faixa int not null,
 
-	constraint PK_id_meio_fis primary key (id_meio_fis),
-	constraint PK_numero_faixa primary key(numero_faixa),
-	constraint FK_meio_fis_meiofaixa (id_meio_fis) references 
-) on spotper_fg02
-*/
 
 
 --gui
@@ -153,7 +122,7 @@ nome nvarchar(100) not null,
 cep varchar(11),
 cidade nvarchar(50),
 rua nvarchar(100),
-end_site varchar(200)
+end_site varchar(200),
 
 CONSTRAINT gravadora_PK primary key (cod_gravad)
 
@@ -203,3 +172,24 @@ create table album
 		CONSTRAINT meio_fisico_CK CHECK (meio_fisico IN ('CD', 'vinil', 'download'))
 
 ) on spotper_fg02
+
+create table faixa
+(
+num_faixa int not null,
+descricao_faixa nvarchar(100) not null,
+tipo_gravacao nvarchar(3) not null,
+dt_ult_tocada date not null,
+vezes_tocada smallint not null,
+tempo_execucao varchar(10) not null, /*analisar o tipo de dado*/
+codigo_composicao smallint not null,
+codigo_album smallint not null,
+
+constraint PK_num_faixa primary key(num_faixa),
+
+constraint FK_cod_composicao foreign key(codigo_composicao) references composicao(cod_composicao)
+on delete no action on update cascade, /*analisar o on delete cascade*/
+
+constraint FK_cod_album foreign key(codigo_album) references album(cod_album)
+on delete cascade on update cascade
+
+) on spotper_fg01
