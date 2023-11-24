@@ -183,16 +183,18 @@ create table album
     dt_compra date not null,
     dt_gravacao date not null,
     cod_gravadora smallint not null,
+		meio_fisico nvarchar(8) not null,
 
     CONSTRAINT cod_album_PK PRIMARY KEY (cod_album),
       
 	  -- Talvez seja melhor criar um gatilho para esse check
     CONSTRAINT album_CK_faixas CHECK ((SELECT COUNT(num_faixa) from Faixa ) <= 64),
 
-	CONSTRAINT album_FK_gravadora FOREIGN KEY (cod_gravadora)
+		CONSTRAINT album_FK_gravadora FOREIGN KEY (cod_gravadora)
     REFERENCES gravadora (cod_gravad)  ON UPDATE cascade ON DELETE NO ACTION,
 
+		CONSTRAINT data_gravacao_CK CHECK  (dt_gravacao> '2000-01-01'),
 
-	CONSTRAINT data_gravacao_CK CHECK  (dt_gravacao> '2000-01-01')
+		CONSTRAINT meio_fisico_CK CHECK (meio_fisico IN ('CD', 'vinil', 'download'))
 
 ) on spotper_fg02
