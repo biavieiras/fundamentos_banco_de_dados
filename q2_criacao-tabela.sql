@@ -51,11 +51,16 @@ tipo_gravacao nvarchar(3) not null,
 dt_ult_tocada date not null,
 vezes_tocada smallint not null,
 tempo_execucao int not null, /*analisar o tipo de dado*/
-codigo_composicao smallint not null
+codigo_composicao smallint not null,
+codigo_album smallint not null
 
 constraint PK_num_faixa primary key(num_faixa),
+
 constraint FK_cod_composicao foreign key(codigo_composicao) references composicao(cod_composicao)
-on delete cascade on update cascade /*analisar o on delete cascade*/
+on delete cascade on update cascade, /*analisar o on delete cascade*/
+
+constraint FK_cod_album foreign key(codigo_album) references album(cod_album)
+on delete cascade on update cascade
 
 ) on spotper_fg01
 
