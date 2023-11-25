@@ -1,0 +1,77 @@
+
+
+/*
+* Gatilhos:
+Garantir que menor salário de vendedores será
+1300
+*/
+
+create trigger t1 on vendedores 
+for insert, update
+as
+if (select salario from inserted) <1300
+  begin
+  raiserror('salario invalido', 16 , 1)
+  rollback transaction
+  end
+
+ 
+ /*
+ O volume de salários pagos em uma 
+ filial não pode ser maior que 15000
+ */
+
+  create trigger tr_vendedores_sal_limite
+  ON vendedores
+  AFTER  INSERT, UPDATE
+  AS 
+  BEGIN
+       DECLARE @codfilial smallint
+	   SELECT @codfilial = codfil from inserted
+
+	   DECLARE @volume decimal(10, 2)
+	   SELECT @volume = SUM(salario) from inserted 
+	   where codfil = @codfilial
+
+	   IF @volume> 15000
+	   BEGIN
+	     raiserror('O volume da filial não pode ser maior que
+		 15000', 16, 1)
+		 ROLLBACK TRANSACTION
+		END
+ END
+
+ select codfil, f.nome, sum(salario) from vendedores v, filiais f
+ where v.codfil = f.cod
+ group by codfil, f.nome
+
+ /*
+ Salário de um vendedor não pode ser maior que 
+ duas vezes a média salarial da filial em que 
+ trabalha
+ */
+
+ CREATE TRIGGER salario_metade_filial
+ ON vendedores
+ INSTEAD OF UPDATE, INSERT
+AS
+BEGIN 
+   DECLARE @salario dec(10,2)
+   SELECT @salario = salario from inserted 
+	 
+   DECLARE @codfil smallint 
+   SELECT @codfil = codfil from inserted
+
+   DECLARE @media_sal dec(10,2)
+   SELECT @media_sal = AVG(salario) from inserted , filiais f
+   where  f.cod = codfil and codfil = @codfil group by codfil
+
+   IF @salario > 2 * @media_sal
+   BEGIN
+      raiserror ('Salario não pode ser maior que o dobro da média da filial', 16, 1)
+
+	  ROLLBACK TRANSACTION
+   END
+END 
+   
+   

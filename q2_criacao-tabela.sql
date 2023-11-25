@@ -162,7 +162,7 @@ create table album
     CONSTRAINT cod_album_PK PRIMARY KEY (cod_album),
       
 	  -- Talvez seja melhor criar um gatilho para esse check
-    CONSTRAINT album_CK_faixas CHECK ((SELECT COUNT(num_faixa) from Faixa ) <= 64),
+
 
 		CONSTRAINT album_FK_gravadora FOREIGN KEY (cod_gravadora)
     REFERENCES gravadora (cod_gravad)  ON UPDATE cascade ON DELETE NO ACTION,
