@@ -13,15 +13,15 @@
 
 -- 3b)
 create trigger limite_faixas_album
-ON  faixas
-AFTER OF UPDATE, INSERT
+ON  faixa
+AFTER  UPDATE, INSERT
 AS 
 BEGIN
 
   declare @cod_album smallint
   declare @qtde_faixas smallint
 
-  select @cod_album from inserted
+  select @cod_album = cod_album from inserted
 
   select @qtde_faixas = count(*) from faixa
   where cod_album = @cod_album
@@ -32,6 +32,27 @@ BEGIN
     ROLLBACK TRANSACTION
     END
 END
+
+
+/*
+Para contemplar a condição:
+. Quando o meio físico de armazenamento é CD, o tipo de gravação tem que
+ser ADD ou DDD. Quando o meio físico de armazenamento é vinil ou
+download, o tipo de gravação não terá valor algum.
+*/
+
+create trigger tipo_de_gravacao_
+ON album
+FOR  UPDATE, INSERT
+AS 
+BEGIN
+    declare @tipo_gravacao char(3)
+    declare @meio_fisico varchar(8)
+
+    select @meio_fisico = meio_fisico from inserted
+    select @tipo_gravacao = tipo_gravacao from faixa f, inserted i
+    where 
+
 
 
 

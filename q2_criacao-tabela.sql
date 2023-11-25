@@ -38,8 +38,8 @@ create table periodo_musical
 	descricao_pm nvarchar(20) not null,
 	intervalo varchar(20),
 	constraint PK_pm primary key (cod_pm),
-	constraint CK_descricao_pm check (descricao_pm in (('idade média',
-	'renascença', 'barroco', 'clássico', 'romântico', 'moderno')))
+	constraint CK_descricao_pm check (descricao_pm in ('idade média','renascença', 'barroco', 'clássico', 'romântico', 'moderno'))
+
 ) on spotper_fg02
 
 --bruna
@@ -49,8 +49,8 @@ create table faixa_compositor
 (
 	numero_faixa int not null,
 	codigo_compositor smallint not null,
-    constraint PK_faixa_faixacompositor primary key (numero_faixa),
-	constraint PK_compositor_faixacompositor primary key (codigo_compositor),
+    constraint PK__faixa_compositor primary key (numero_faixa, codigo_compositor),
+	
 	constraint FK_faixa_faixacompositor foreign key(numero_faixa) references playlist(cod_playlist)
 	on delete no action on update cascade,
 	constraint FK_compositor_faixacompositor foreign key(codigo_compositor) references compositor(cod_compositor)
@@ -62,11 +62,13 @@ create table faixa_playlist
 (
 	id_playlist int not null,
 	cod_faixa int not null,
-    constraint PK_id_playlist primary key (id_playlist),
-	constraint PK_cod_faixa primary key (cod_faixa),
+
+    constraint PK_faixa_playlist primary key (id_playlist,cod_faixa),
+	
 	constraint FK_cod_playlist foreign key(id_playlist) references playlist(cod_playlist)
 	on delete no action on update cascade,
-	constraint FK_cod_faixa foreign key(cod_faixa) references playlist(num_faixa)
+
+	constraint FK_cod_faixa foreign key(cod_faixa) references faixa(num_faixa)
 	on delete no action on update cascade
 ) on spotper_fg01
 
@@ -88,7 +90,8 @@ create table interprete
 	cod_interprete smallint not null,
 	nome_interprete nvarchar(50) not null,
 	tipo_interprete nvarchar(10) not null,
-	constraint PK_cod_interprete check(cod_interprete in ('orquestra', 'trio', 'quarteto', 'ensemble', 'soprano', 'tenor')),
+	constraint CK_cod_interprete check(cod_interprete in ('orquestra', 'trio', 'quarteto', 'ensemble', 'soprano', 'tenor')),
+	constraint PK_cod_interprete primary key (cod_interprete)
 ) on spotper_fg02
 
 
@@ -96,17 +99,17 @@ create table interprete
 create table faixa_interprete
 (
 cod_interprete smallint not null,
-num_faixa smallint not null,
+num_faixa int not null,
 
-constraint PK_cod_interprete primary key (cod_interprete),
+constraint PK_cod_interprete_faixa primary key (cod_interprete,num_faixa),
 
-constraint PK_num_faixa primary key (num_faixa),
 
-constraint FK_cod_interprete foreign key (cod_interprete) 
-references interprete (cod_interprete),
+constraint FK_cod_faixainterprete foreign key (cod_interprete) 
+references interprete (cod_interprete) on UPDATE CASCADE ON DELETE NO ACTION,
 
-constraint FK_num_faixa foreign key (num_faixa)
-references faixa (num_faixa)
+constraint FK_num_faixainterprete foreign key (num_faixa) 
+references faixa (num_faixa) on UPDATE CASCADE ON DELETE NO ACTION,
+
 
 ) on spotper_fg02
 
@@ -157,19 +160,17 @@ create table album
     dt_compra date not null,
     dt_gravacao date not null,
     cod_gravadora smallint not null,
-		meio_fisico nvarchar(8) not null,
+	meio_fisico varchar(8) not null,
 
     CONSTRAINT cod_album_PK PRIMARY KEY (cod_album),
       
-	  -- Talvez seja melhor criar um gatilho para esse check
 
-
-		CONSTRAINT album_FK_gravadora FOREIGN KEY (cod_gravadora)
+	CONSTRAINT album_FK_gravadora FOREIGN KEY (cod_gravadora)
     REFERENCES gravadora (cod_gravad)  ON UPDATE cascade ON DELETE NO ACTION,
 
-		CONSTRAINT data_gravacao_CK CHECK  (dt_gravacao> '2000-01-01'),
+	CONSTRAINT data_gravacao_CK CHECK  (dt_gravacao> '2000-01-01'),
 
-		CONSTRAINT meio_fisico_CK CHECK (meio_fisico IN ('CD', 'vinil', 'download'))
+	CONSTRAINT meio_fisico_CK CHECK (meio_fisico IN ('CD', 'vinil', 'download'))
 
 ) on spotper_fg02
 
@@ -177,7 +178,7 @@ create table faixa
 (
 num_faixa int not null,
 descricao_faixa nvarchar(100) not null,
-tipo_gravacao nvarchar(3) not null,
+tipo_gravacao char(3) ,
 dt_ult_tocada date not null,
 vezes_tocada smallint not null,
 tempo_execucao varchar(10) not null, /*analisar o tipo de dado*/
