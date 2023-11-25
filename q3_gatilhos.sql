@@ -41,18 +41,42 @@ ser ADD ou DDD. Quando o meio físico de armazenamento é vinil ou
 download, o tipo de gravação não terá valor algum.
 */
 
+
+
 create trigger tipo_de_gravacao_
-ON album
+ON faixa
 FOR  UPDATE, INSERT
 AS 
 BEGIN
     declare @tipo_gravacao char(3)
     declare @meio_fisico varchar(8)
+	declare @cod_album smallint
 
-    select @meio_fisico = meio_fisico from inserted
-    select @tipo_gravacao = tipo_gravacao from faixa f, inserted i
-    where 
+   
+    SELECT  @cod_album = codigo_album from inserted
+	
+	select @meio_fisico = meio_fisico from album 
+	where cod_album = @cod_album
 
+    select @tipo_gravacao = tipo_gravacao  from inserted
 
+	if @meio_fisico = 'CD'
+	BEGIN
+	  if @tipo_gravacao not in ('ADD', 'DDD')
+	  BEGIN
+	      RAISERROR('O tipo de gravação deve ser ADD ou DDD',16,1)
+		  ROLLBACK TRANSACTION
+      END
+	END
 
+	ELSE 
+	BEGIN
+	   IF @tipo_gravacao <> NULL
+	   BEGIN
+	    RAISERROR('O tipo de gravação deve ser NULO',16,1)
+		  ROLLBACK TRANSACTION
+        END
+    END
+END
+    
 
