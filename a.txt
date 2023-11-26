@@ -1,77 +1,75 @@
 
 
-/*
-* Gatilhos:
-Garantir que menor salário de vendedores será
-1300
-*/
 
-create trigger t1 on vendedores 
-for insert, update
-as
-if (select salario from inserted) <1300
-  begin
-  raiserror('salario invalido', 16 , 1)
-  rollback transaction
-  end
+
+SELECT floor(4.55);
+
+
+alter table faixa
+--add  id_faixa int not null
+--add constraint PK_id_faixa primary key (id_faixa)
+drop  PK_num_faixa
+
+create trigger trigger_tempo_execucao
+ON faixa_playlist
+AFTER UPDATE, INSERT
+AS 
+BEGIN
+declare @tempo_exec_playlist varchar(10)
+declare @tempo_exec_faixa varchar(10)
+
+
+declare @id_play int
+declare @id_faixa int
+
+
+select @id_play = id_playlist, @id_faixa =cod_faixa from inserted
+
+select @tempo_exec_playlist = tempo_exec from playlist
+where cod_playlist = @id_play
+
+select @tempo_exec_faixa  = tempo_execucao  from faixa
+where id_faixa  = @id_faixa
+
+declare @aux4  dec(6,2)
+declare @aux1 dec(6,2)
+declare @aux2 dec(6,2)
+declare @aux3 dec(6,2)
+-------------------------------------------------------------
+select @aux1 = cast ( @tempo_exec_faixa as dec(6,2))
+select @aux2 = FLOOR(@aux1) * 60 + ( @aux1%floor(@aux1))*100
+
+-------------------------------------------------------------
+select @aux3 = cast ( @tempo_exec_playlist as dec(6,2))
+select @aux4 = FLOOR(@aux3) * 60 + ( @aux3%floor(@aux3))*100
+
+-- somando o tempo total:
+select @tempo_exec_playlist = floor((@aux2 + @aux4 )/60) + (((@aux2 + @aux4)%60)/100)
+
+select tempo_exec = @tempo_exec_playlist from playlist
+where cod_playlist = @id_play
+
 
  
- /*
- O volume de salários pagos em uma 
- filial não pode ser maior que 15000
- */
 
-  create trigger tr_vendedores_sal_limite
-  ON vendedores
-  AFTER  INSERT, UPDATE
-  AS 
-  BEGIN
-       DECLARE @codfilial smallint
-	   SELECT @codfilial = codfil from inserted
 
-	   DECLARE @volume decimal(10, 2)
-	   SELECT @volume = SUM(salario) from inserted 
-	   where codfil = @codfilial
 
-	   IF @volume> 15000
-	   BEGIN
-	     raiserror('O volume da filial não pode ser maior que
-		 15000', 16, 1)
-		 ROLLBACK TRANSACTION
-		END
- END
 
- select codfil, f.nome, sum(salario) from vendedores v, filiais f
- where v.codfil = f.cod
- group by codfil, f.nome
 
- /*
- Salário de um vendedor não pode ser maior que 
- duas vezes a média salarial da filial em que 
- trabalha
- */
 
- CREATE TRIGGER salario_metade_filial
- ON vendedores
- INSTEAD OF UPDATE, INSERT
-AS
-BEGIN 
-   DECLARE @salario dec(10,2)
-   SELECT @salario = salario from inserted 
-	 
-   DECLARE @codfil smallint 
-   SELECT @codfil = codfil from inserted
 
-   DECLARE @media_sal dec(10,2)
-   SELECT @media_sal = AVG(salario) from inserted , filiais f
-   where  f.cod = codfil and codfil = @codfil group by codfil
 
-   IF @salario > 2 * @media_sal
-   BEGIN
-      raiserror ('Salario não pode ser maior que o dobro da média da filial', 16, 1)
 
-	  ROLLBACK TRANSACTION
-   END
-END 
-   
-   
+
+
+
+
+declare @aux  dec(6,2)
+
+select @aux = 270
+
+--select FLOOR(@aux) * 60 + ( @aux%floor(@aux))*100
+
+select  (floor((270.00 )/60) + ((270.00)%60)/100)
+
+
