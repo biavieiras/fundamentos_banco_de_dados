@@ -127,7 +127,8 @@ create table album
     dt_compra date not null,
     dt_gravacao date not null,
     cod_gravadora smallint not null,
-	meio_fisico varchar(8) not null,
+	  meio_fisico varchar(8) not null,
+	  qtde_disco smallint not null,
 
     CONSTRAINT cod_album_PK PRIMARY KEY (cod_album),
       
@@ -156,6 +157,7 @@ vezes_tocada smallint not null,
 tempo_execucao varchar(10) not null, /*analisar o tipo de dado*/
 codigo_composicao smallint not null,
 codigo_album smallint not null,
+num_disco smallint,
 
 constraint PK_num_faixa primary key(id_faixa),
 

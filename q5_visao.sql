@@ -5,12 +5,11 @@
 
 
 
-
-create view playlist_qtde_albuns(nome_playlist, qtde_albuns)
+alter view playlist_qtde_albuns(nome_playlist, qtde_albuns)
 with schemabinding
 as
-   select nome_playlist, count_big(cod_album) from playlist, faixa_playlist,
-   faixa f, album a
+   select nome_playlist, count_big(*) from dbo.playlist, dbo.faixa_playlist,
+   dbo.faixa f, dbo.album a
    
    where cod_playlist = id_playlist and cod_faixa = f.id_faixa and f.codigo_album = a.cod_album
    group by nome_playlist

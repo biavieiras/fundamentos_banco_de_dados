@@ -146,8 +146,7 @@ where cod_playlist = @id_play
 IF EXISTS (SELECT * FROM deleted)
 update playlist set tempo_exec = cast((floor((@aux2 - @aux4 )/60) + (((@aux2 - @aux4)%60)/100)) as varchar(10)) from deleted
 where cod_playlist = @id_play
-*/
-    
+*/  
 END
 
 /*
@@ -168,7 +167,7 @@ BEGIN
 
 	select @pr_compra=pr_compra, @cod_album= cod_album from inserted
  
-	select @media_pr_album_DDD = AVG(pr_compra)  from album a,faixa f
+	select @media_pr_album_DDD = AVG(pr_compra) from album a,faixa f
 	where a.cod_album = f.codigo_album and tipo_gravacao ='DDD'
 
 	IF @pr_compra > 3 * @media_pr_album_DDD
@@ -187,4 +186,75 @@ BEGIN
 	       INSERT INTO album SELECT * FROM inserted
 
      END
+END
+
+
+/*
+album: gatilho para checar caso o meio_fisico de album seja CD ou vinil na inserção,
+a qtde_disco deve ser maior que zero e diferente de nulo
+*/
+
+create trigger qtde_disco_album on album
+for insert, update
+as
+begin
+
+declare @meio_fis varchar(8)
+declare @qtde_disco smallint
+
+select @meio_fis = meio_fisico, @qtde_disco = qtde_disco from inserted
+if @meio_fis = 'CD' or @meio_fis = 'vinil'
+	begin
+	if @qtde_disco <= 0
+		begin
+		RAISERROR('A quantidade de discos deve ser maior que 0',16,1)
+		ROLLBACK TRANSACTION
+		END
+	end
+else
+	begin
+	if  @qtde_disco <> 0
+		begin
+		RAISERROR('A quantidade de discos deve ser igual a 0, pois se trata de um download',16,1)
+		ROLLBACK TRANSACTION
+		END
+	end
+end
+
+
+
+/*
+faixa: gatilho para checar caso o meio_fisico de album seja CD ou vinil na inserção,
+o num_disco deve ser diferente de nulo, maior que zero e menor ou igual a qtde_disco.
+*/
+
+create trigger num_disco_faixa on faixa
+for insert, update 
+as
+begin
+
+declare @num_disco smallint
+declare @meio_fis varchar(8)
+declare @cod_album smallint
+declare @qtde_disc smallint
+
+select @num_disco = num_disco, @cod_album = codigo_album from inserted
+select @meio_fis = meio_fisico, @qtde_disc = qtde_disco from album a where a.cod_album = @cod_album
+
+if @meio_fis = 'CD' or @meio_fis = 'vinil'
+begin
+	if @num_disco = NULL or @num_disco < 1 or @num_disco > @qtde_disco
+	begin
+		RAISERROR('O número do disco deve receber um valor diferente de nulo, maior que 1 e menor que a quantidade de discos',16,1)
+		ROLLBACK TRANSACTION
+	END
+end
+else 
+begin
+	if @num_disco <> null
+	begin
+		RAISERROR('O número do disco deve ser nulo, pois trata-se de um download',16,1)
+		ROLLBACK TRANSACTION
+	END
+END
 END

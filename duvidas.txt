@@ -15,3 +15,7 @@ sendo especificado na descrição do trabalho?
 5. Deve haver um check em interprete e composição para os tipos?
 
 6. Como fica as foreign keys entre os meios físicos e meio_faixa
+
+7. d) O preço de compra de um álbum não dever ser superior a três vezes a média
+  do preço de compra de álbuns, com todas as faixas com tipo de gravação
+  DDD.
