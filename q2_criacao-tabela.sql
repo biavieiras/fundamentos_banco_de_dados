@@ -133,7 +133,8 @@ create table album
       
 
 	CONSTRAINT album_FK_gravadora FOREIGN KEY (cod_gravadora)
-    REFERENCES gravadora (cod_gravad)  ON UPDATE cascade ON DELETE NO ACTION,
+	-- UPDATE NO ACTION pois se não dará problema no gatilho criado
+    REFERENCES gravadora (cod_gravad)  ON UPDATE NO ACTION ON DELETE NO ACTION,
 
 	CONSTRAINT data_gravacao_CK CHECK  (dt_gravacao> '2000-01-01'),
 

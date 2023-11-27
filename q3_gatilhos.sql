@@ -12,25 +12,38 @@
 */
 
 -- 3b)
+
 create trigger limite_faixas_album
 ON  faixa
 AFTER  UPDATE, INSERT
 AS 
 BEGIN
-
+  declare @cod_faixa int
   declare @cod_album smallint
   declare @qtde_faixas smallint
 
-  select @cod_album = cod_album from inserted
+  select @cod_album = codigo_album from inserted
 
   select @qtde_faixas = count(*) from faixa
-  where cod_album = @cod_album
+  where codigo_album = @cod_album
 
   IF @qtde_faixas > 64
   BEGIN
     RAISERROR ('Quantidade de faixas não pode ser maior que 64', 16, 1)
     ROLLBACK TRANSACTION
     END
+  
+  ELSE
+	BEGIN
+	   IF EXISTS(SELECT * FROM DELETED)
+	       UPDATE faixa SET codigo_album = @cod_album
+		   where id_faixa = @cod_faixa
+
+       ELSE
+	       INSERT INTO faixa SELECT * FROM inserted
+
+     END
+   
 END
 
 
@@ -135,4 +148,43 @@ update playlist set tempo_exec = cast((floor((@aux2 - @aux4 )/60) + (((@aux2 - @
 where cod_playlist = @id_play
 */
     
+END
+
+/*
+ 3d) O preço de compra de um álbum não dever ser superior a três vezes a média
+  do preço de compra de álbuns, com todas as faixas com tipo de gravação
+  DDD.
+  *** OBS : Revisar
+*/
+create trigger preco_compra_album
+ON album
+INSTEAD OF INSERT, UPDATE
+AS
+BEGIN
+
+	declare @pr_compra decimal(7,2)
+	declare @cod_album smallint 
+	declare @media_pr_album_DDD decimal(7,2)
+
+	select @pr_compra=pr_compra, @cod_album= cod_album from inserted
+ 
+	select @media_pr_album_DDD = AVG(pr_compra)  from album a,faixa f
+	where a.cod_album = f.codigo_album and tipo_gravacao ='DDD'
+
+	IF @pr_compra > 3 * @media_pr_album_DDD
+	BEGIN
+		RAISERROR('O preço de compra do album execedeu o valor permitido', 16, 1)
+		ROLLBACK TRANSACTION
+	END
+
+	ELSE
+	BEGIN
+	   IF EXISTS(SELECT * FROM DELETED)
+	       UPDATE album SET pr_compra = @pr_compra 
+		   where cod_album = @cod_album
+
+       ELSE
+	       INSERT INTO album SELECT * FROM inserted
+
+     END
 END
