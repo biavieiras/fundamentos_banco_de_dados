@@ -12,7 +12,7 @@
 */
 
 -- 3b)
--- FALTANDO TESTAR
+-- FUNCIONANDO !!!
 
 create trigger limite_faixas_album
 ON  faixa
@@ -160,7 +160,8 @@ END
 
 
 /*
-   FUNCIONANDO !!!
+CORRIGIR
+todas as faixas do gatilho devem ser do tipo DDD
  3d) O preço de compra de um álbum não dever ser superior a três vezes a média
   do preço de compra de álbuns, com todas as faixas com tipo de gravação
   DDD.
@@ -175,18 +176,28 @@ BEGIN
 	declare @pr_compra decimal(7,2)
 	declare @cod_album smallint 
 	declare @media_pr_album_DDD decimal(7,2)
+	DECLARE @album smallint
 
 	select @pr_compra=pr_compra, @cod_album= cod_album from inserted
  
 	select @media_pr_album_DDD = AVG(pr_compra) from album a,faixa f
-	where a.cod_album = f.codigo_album and tipo_gravacao ='DDD'
+	where a.cod_album = f.codigo_album and 
+	a.cod_album not in (SELECT distinct f.codigo_album from  faixa f
+	where  tipo_gravacao = 'ADD'
+	OR tipo_gravacao IS NULL)
 
+	PRINT @media_pr_album_DDD
+	print @album
 	IF @pr_compra > 3 * @media_pr_album_DDD
 	BEGIN
 		RAISERROR('O preço de compra do album execedeu o valor permitido', 16, 1)
 		ROLLBACK TRANSACTION
 	END
 END
+
+INSERT INTO album (cod_album, descricao_album, nome, tipo_compra, pr_compra, dt_compra, dt_gravacao, cod_gravadora, meio_fisico, qtde_disco)
+VALUES
+  (24, 'Álbum LGTV', 'Artista POP Plabo Vitah', 'cartão', 288.00, '2023-01-10', '2022-12-01', 1, 'CD', 6)
 
 
 
@@ -304,3 +315,8 @@ begin
 		end
 	end
 end
+
+
+
+
+
