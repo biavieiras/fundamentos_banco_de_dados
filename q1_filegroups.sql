@@ -9,13 +9,14 @@ deve conter dois arquivos e um terceiro deve conter apenas um arquivo.
 
 */
 
-create database SpotPerTest
+
+create database SpotPer
 on
 	--fg primario contem apenas o arquivo primario do bd
 	primary
 	(
 	name = 'SpotPer',
-	filename = 'D:\SpotPerTest\spotper.mdf',
+	filename = 'D:\SpotPer\spotper.mdf',
 	size = 5120KB,
 	filegrowth = 15%
 	),
@@ -24,7 +25,7 @@ on
 	filegroup spotper_fg01
 	(
 	name = 'spotper_001',
-	filename = 'D:\SpotPerTest\spotper_001.ndf',
+	filename = 'D:\SpotPer\spotper_001.ndf',
 	size = 1024KB,
 	filegrowth = 15%
 	),
@@ -33,14 +34,14 @@ on
 	FILEGROUP spotper_fg02
 	(
 	NAME = 'spotper_002',
-	filename = 'D:\SpotPerTest\spotper_002.ndf',
+	filename = 'D:\SpotPer\spotper_002.ndf',
 	size = 1024KB,
 	filegrowth = 15%
 	),
 
 	(
 	NAME = 'spotper_003',
-	FILENAME = 'D:\SpotPerTest\spotper_003.ndf',
+	FILENAME = 'D:\SpotPer\spotper_003.ndf',
 	SIZE = 1024KB,
 	FILEGROWTH = 15%
 	)
@@ -48,7 +49,8 @@ on
 	log on --*verificar em qual filegroup colocar o log
 	(
 	name = 'spotper_log',
-	filename = 'D:\SpotPerTest\spotper_log.ldf',
+	filename = 'D:\SpotPer\spotper_log.ldf',
 	size = 1024KB,
 	filegrowth = 15%
 	)
+

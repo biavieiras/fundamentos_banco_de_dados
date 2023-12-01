@@ -18,3 +18,15 @@ funcionalidades:
       período “Barroco”.
 */
 
+import pyodbc
+
+def conecta_ao_banco(driver='SQL Server Native Client 11.0', server='REVISION-PC\SQLEXPRESS', database='SpotPerTest', username=None, password=None, trusted_connection='yes'):
+    string_conexao = f"DRIVER={driver};SERVER={server};DATABASE={database};UID={username};PWD={password};TRUSTED_CONNECTION={trusted_connection}"
+
+    conexao = pyodbc.connect(string_conexao)
+    cursor = conexao.cursor()
+
+    return conexao, cursor
+
+conexao, cursor = conecta_ao_banco()
+print(cursor.execute('SELECT * from Compositor').fetchall())

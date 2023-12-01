@@ -19,3 +19,7 @@ sendo especificado na descrição do trabalho?
 7. d) O preço de compra de um álbum não dever ser superior a três vezes a média
   do preço de compra de álbuns, com todas as faixas com tipo de gravação
   DDD.
+
+
+8.  Por que ao usar o INSTEAD OF em um gatilho pode retornar erro
+relacionado ao UPDATE CASCADE?

@@ -1,14 +1,14 @@
 /*
 3) Defina as seguintes restrições
-  a) Um álbum, com faixas de músicas do período barroco, só pode ser inserido no
-  banco de dados, caso o tipo de gravação seja DDD.
-  b) Um álbum não pode ter mais que 64 faixas (músicas).
-  c) No caso de remoção de um álbum do banco de dados, todas as suas faixas
-  devem ser removidas. Lembre-se que faixas podem apresentar, por sua vez,
-  outros relacionamentos. (É contemplada no delete on cascade)
-  d) O preço de compra de um álbum não dever ser superior a três vezes a média
-  do preço de compra de álbuns, com todas as faixas com tipo de gravação
-  DDD.
+      a) Um álbum, com faixas de músicas do período barroco, só pode ser inserido no
+      banco de dados, caso o tipo de gravação seja DDD.
+  OK  b) Um álbum não pode ter mais que 64 faixas (músicas).
+  OK? c) No caso de remoção de um álbum do banco de dados, todas as suas faixas
+      devem ser removidas. Lembre-se que faixas podem apresentar, por sua vez,
+      outros relacionamentos. (É contemplada no delete on cascade)
+  OK  d) O preço de compra de um álbum não dever ser superior a três vezes a média
+      do preço de compra de álbuns, com todas as faixas com tipo de gravação
+       DDD.
 */
 
 -- 3b)
@@ -55,7 +55,7 @@ download, o tipo de gravação não terá valor algum.
 */
 
 
-create trigger tipo_de_gravacao_
+create trigger tipo_de_gravacao
 ON faixa
 FOR  UPDATE, INSERT
 AS 
@@ -149,6 +149,9 @@ where cod_playlist = @id_play
 */  
 END
 
+
+
+
 /*
  3d) O preço de compra de um álbum não dever ser superior a três vezes a média
   do preço de compra de álbuns, com todas as faixas com tipo de gravação
@@ -157,7 +160,7 @@ END
 */
 create trigger preco_compra_album
 ON album
-INSTEAD OF INSERT, UPDATE
+FOR INSERT, UPDATE
 AS
 BEGIN
 
@@ -190,6 +193,7 @@ END
 
 
 /*
+FUNCIONANDO!
 album: gatilho para checar caso o meio_fisico de album seja CD ou vinil na inserção,
 a qtde_disco deve ser maior que zero e diferente de nulo
 */
@@ -258,3 +262,43 @@ begin
 	END
 END
 END
+
+
+/*
+3)a) Um álbum, com faixas de músicas do período barroco, 
+só pode ser inserido no banco de dados, caso o tipo de 
+gravação seja DDD.
+*/
+
+-- se a descricao_pm do pm de um compositor de uma faixa
+-- q será inserido em um album for igual a 'barroco', 
+-- o ti
+
+--CONSERTAR:
+alter trigger faixa_pm_barroco
+on faixa
+after update, insert
+as
+begin
+	declare @desc_pm varchar(20)
+	declare @tipo_grav char(3)
+	declare @id_faixa int
+
+	select @tipo_grav = tipo_gravacao from inserted
+
+	select @id_faixa = id_faixa from inserted
+
+	select @desc_pm = pm.descricao_pm
+	from periodo_musical pm, compositor c, faixa_compositor fc
+	where pm.cod_pm = c.cod_periodo_mus and c.cod_compositor = fc.id_compositor
+	and fc.cod_faixa = @id_faixa
+
+	if @desc_pm = 'barroco'
+		begin
+		if @tipo_grav <> 'DDD'
+			begin
+			raiserror('O álbum contém faixa(s) do período musical barroco, que não é/são o tipo de gravação DDD', 16, 1)
+			rollback transaction
+		end
+	end
+end

@@ -5,10 +5,10 @@
 -- composição. Os dois com taxas de preenchimento máxima.
 
 CREATE CLUSTERED INDEX faixas_IDX_album ON
-FAIXAS (cod_album)
+FAIXA (codigo_album)
 WITH (fillfactor = 100, pad_index = on)
 
 
 CREATE NONCLUSTERED INDEX faixas_IDX_composicao ON
-FAIXAS (codigo_composicao)
+FAIXA (codigo_composicao)
 WITH (fillfactor = 100, pad_index = on)

@@ -64,7 +64,7 @@ create table interprete
 	cod_interprete smallint not null,
 	nome_interprete nvarchar(50) not null,
 	tipo_interprete nvarchar(10) not null,
-	constraint CK_cod_interprete check(cod_interprete in ('orquestra', 'trio', 'quarteto', 'ensemble', 'soprano', 'tenor')),
+	constraint CK_tipo_interprete check(tipo_interprete in ('orquestra', 'trio', 'quarteto', 'ensemble', 'soprano', 'tenor')),
 	constraint PK_cod_interprete primary key (cod_interprete)
 ) on spotper_fg02
 
@@ -110,7 +110,8 @@ create table compositor
 	cidade_nasc nvarchar(10),
 	pais_nasc nvarchar(10),
 	constraint PK_compositor primary key (cod_compositor),
-	constraint FK_compositor foreign key (cod_periodo_mus) references periodo_musical (cod_pm) on delete no action on update cascade
+	constraint FK_compositor foreign key (cod_periodo_mus) references periodo_musical 
+	(cod_pm) on delete no action on update cascade
 ) on spotper_fg02
 
 
@@ -134,12 +135,14 @@ create table album
       
 
 	CONSTRAINT album_FK_gravadora FOREIGN KEY (cod_gravadora)
-	-- UPDATE NO ACTION pois se não dará problema no gatilho criado
-    REFERENCES gravadora (cod_gravad)  ON UPDATE NO ACTION ON DELETE NO ACTION,
+
+  REFERENCES gravadora (cod_gravad)  ON UPDATE CASCADE ON DELETE NO ACTION,
 
 	CONSTRAINT data_gravacao_CK CHECK  (dt_gravacao> '2000-01-01'),
 
-	CONSTRAINT meio_fisico_CK CHECK (meio_fisico IN ('CD', 'vinil', 'download'))
+	CONSTRAINT meio_fisico_CK CHECK (meio_fisico IN ('CD', 'vinil', 'download')),
+
+	constraint tipo_compra_CK check (tipo_compra in ('cartão', 'dinheiro', 'pix'))
 
 ) on spotper_fg02
 
@@ -151,18 +154,19 @@ create table faixa
 (
 id_faixa int not null,
 descricao_faixa nvarchar(100) not null,
-tipo_gravacao char(3) ,
+num_faixa smallint not null,
+tipo_gravacao char(3) , -- DDD OU ADD
 dt_ult_tocada date not null,
 vezes_tocada smallint not null,
-tempo_execucao varchar(10) not null, /*analisar o tipo de dado*/
+tempo_execucao varchar(10) not null, 
 codigo_composicao smallint not null,
 codigo_album smallint not null,
 num_disco smallint,
 
-constraint PK_num_faixa primary key(id_faixa),
+constraint PK_id_faixa_album primary key NONCLUSTERED (id_faixa),
 
 constraint FK_cod_composicao foreign key(codigo_composicao) references composicao(cod_composicao)
-on delete no action on update cascade, /*analisar o on delete cascade*/
+on delete no action on update cascade, 
 
 constraint FK_cod_album foreign key(codigo_album) references album(cod_album)
 on delete cascade on update cascade
@@ -210,10 +214,10 @@ create table faixa_playlist
     constraint PK_faixa_playlist primary key (id_playlist,cod_faixa),
 	
 	constraint FK_cod_playlist foreign key(id_playlist) references playlist(cod_playlist)
-	on delete cascade on update cascade,
+	on delete no action on update cascade,
 
 	constraint FK_cod_faixa foreign key(cod_faixa) references faixa(id_faixa)
-	on delete cascade on update cascade
+	on delete no action on update cascade
 ) on spotper_fg01
 
 
