@@ -12,6 +12,7 @@
 */
 
 -- 3b)
+-- FALTANDO TESTAR
 
 create trigger limite_faixas_album
 ON  faixa
@@ -48,6 +49,7 @@ END
 
 
 /*
+FUNCIONANDO!!!
 Para contemplar a condição:
 . Quando o meio físico de armazenamento é CD, o tipo de gravação tem que
 ser ADD ou DDD. Quando o meio físico de armazenamento é vinil ou
@@ -55,40 +57,44 @@ download, o tipo de gravação não terá valor algum.
 */
 
 
-create trigger tipo_de_gravacao
+alter trigger tipo_de_gravacao
 ON faixa
-FOR  UPDATE, INSERT
+FOR INSERT, UPDATE
 AS 
 BEGIN
-  declare @tipo_gravacao char(3)
+  declare @tipo_gravacao char(3) 
   declare @meio_fisico varchar(8)
 	declare @cod_album smallint
 
    
-  SELECT  @cod_album = codigo_album from inserted
+  SELECT  @cod_album = codigo_album, @tipo_gravacao = tipo_gravacao 
+  from inserted
 	
 	select @meio_fisico = meio_fisico from album 
 	where cod_album = @cod_album
 
-  select @tipo_gravacao = tipo_gravacao  from inserted
+   
 
 	if @meio_fisico = 'CD'
 	BEGIN
-	  if @tipo_gravacao not in ('ADD', 'DDD')
+	
+	  if  (@tipo_gravacao != 'ADD' and @tipo_gravacao != 'DDD') or @tipo_gravacao IS NULL
 	  BEGIN
+	  
 	      RAISERROR('O tipo de gravação deve ser ADD ou DDD',16,1)
 		  ROLLBACK TRANSACTION
-      END
+    END
 	END
 
 	ELSE 
 	BEGIN
-	   IF @tipo_gravacao <> NULL
+	   IF @tipo_gravacao IS NOT NULL
 	   BEGIN
 	    RAISERROR('O tipo de gravação deve ser NULO',16,1)
 		  ROLLBACK TRANSACTION
         END
     END
+
 END
 
 
@@ -96,6 +102,7 @@ END
 Gatilho para atualização do tempo de execução
 da playlist à medida que novas faixas são
 adicionadas:
+TO BE CONTINUED
 */
 
 
@@ -153,12 +160,13 @@ END
 
 
 /*
+   FUNCIONANDO !!!
  3d) O preço de compra de um álbum não dever ser superior a três vezes a média
   do preço de compra de álbuns, com todas as faixas com tipo de gravação
   DDD.
-  *** OBS : Revisar
+  
 */
-create trigger preco_compra_album
+ALTER trigger preco_compra_album
 ON album
 FOR INSERT, UPDATE
 AS
@@ -178,18 +186,8 @@ BEGIN
 		RAISERROR('O preço de compra do album execedeu o valor permitido', 16, 1)
 		ROLLBACK TRANSACTION
 	END
-
-	ELSE
-	BEGIN
-	   IF EXISTS(SELECT * FROM DELETED)
-	       UPDATE album SET pr_compra = @pr_compra 
-		   where cod_album = @cod_album
-
-       ELSE
-	       INSERT INTO album SELECT * FROM inserted
-
-     END
 END
+
 
 
 /*
@@ -228,9 +226,11 @@ end
 
 
 /*
+FUNCIONANDO !!!
 faixa: gatilho para checar caso o meio_fisico de album seja CD ou vinil na inserção,
 o num_disco deve ser diferente de nulo, maior que zero e menor ou igual a qtde_disco.
 */
+
 
 create trigger num_disco_faixa on faixa
 for insert, update 
@@ -240,14 +240,14 @@ begin
 declare @num_disco smallint
 declare @meio_fis varchar(8)
 declare @cod_album smallint
-declare @qtde_disc smallint
+declare @qtde_disco smallint
 
 select @num_disco = num_disco, @cod_album = codigo_album from inserted
-select @meio_fis = meio_fisico, @qtde_disc = qtde_disco from album a where a.cod_album = @cod_album
+select @meio_fis = meio_fisico, @qtde_disco = qtde_disco from album a where a.cod_album = @cod_album
 
 if @meio_fis = 'CD' or @meio_fis = 'vinil'
 begin
-	if @num_disco = NULL or @num_disco < 1 or @num_disco > @qtde_disco
+	if @num_disco IS NULL or @num_disco < 1 or @num_disco > @qtde_disco
 	begin
 		RAISERROR('O número do disco deve receber um valor diferente de nulo, maior que 1 e menor que a quantidade de discos',16,1)
 		ROLLBACK TRANSACTION
@@ -255,7 +255,7 @@ begin
 end
 else 
 begin
-	if @num_disco <> null
+	if @num_disco IS NOT null 
 	begin
 		RAISERROR('O número do disco deve ser nulo, pois trata-se de um download',16,1)
 		ROLLBACK TRANSACTION
@@ -265,6 +265,7 @@ END
 
 
 /*
+FUNCIONANDO !!!!
 3)a) Um álbum, com faixas de músicas do período barroco, 
 só pode ser inserido no banco de dados, caso o tipo de 
 gravação seja DDD.
@@ -274,30 +275,31 @@ gravação seja DDD.
 -- q será inserido em um album for igual a 'barroco', 
 -- o ti
 
---CONSERTAR:
+
 alter trigger faixa_pm_barroco
-on faixa
+on faixa_compositor
 after update, insert
 as
 begin
 	declare @desc_pm varchar(20)
 	declare @tipo_grav char(3)
 	declare @id_faixa int
+	declare @id_compositor smallint
 
-	select @tipo_grav = tipo_gravacao from inserted
+	
 
-	select @id_faixa = id_faixa from inserted
+	select @id_faixa = cod_faixa ,@id_compositor =id_compositor  from inserted
 
-	select @desc_pm = pm.descricao_pm
-	from periodo_musical pm, compositor c, faixa_compositor fc
-	where pm.cod_pm = c.cod_periodo_mus and c.cod_compositor = fc.id_compositor
-	and fc.cod_faixa = @id_faixa
+	select @desc_pm = pm.descricao_pm, @tipo_grav = tipo_gravacao
+	from periodo_musical pm, compositor c, inserted i, faixa f
+	where pm.cod_pm = c.cod_periodo_mus and c.cod_compositor = @id_compositor
+	and  f.id_faixa = @id_faixa
 
 	if @desc_pm = 'barroco'
 		begin
-		if @tipo_grav <> 'DDD'
+		if @tipo_grav <> 'DDD' OR @tipo_grav is null
 			begin
-			raiserror('O álbum contém faixa(s) do período musical barroco, que não é/são o tipo de gravação DDD', 16, 1)
+			raiserror('Um álbum não pode conter uma faixa do período Barroco com o tipo de gravação não sendo DDD', 16, 1)
 			rollback transaction
 		end
 	end
