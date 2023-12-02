@@ -22,7 +22,7 @@ import pyodbc
 #usar comando pip install pyodbc no terminal
 
 driver='SQL Server' 
-server='DESKTOP-ELFS8LL\SQLEXPRESS'
+server='DESKTOP-ELFS8LL'
 database='SpotPer'
 username=None
 password=None
@@ -57,3 +57,8 @@ listar_albuns(cursor);
 cursor.close();
 connection.close();
 
+#Se a consulta estiver mudando algo no banco (adc tupla, altera tabela, etc.), deve-se usar o comando cursor.commit()
+#Exemplo:
+#comando = "INSERT INTO Aluno VALUES(5689, 'Claudinho', '05987456322', '20161771986', 'Rua Caucaianos', 103)"
+#cursor.execute(comando)
+#cursor.commit()
