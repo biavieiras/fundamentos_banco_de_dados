@@ -98,66 +98,6 @@ BEGIN
 END
 
 
-/*
-Gatilho para atualização do tempo de execução
-da playlist à medida que novas faixas são
-adicionadas:
-TO BE CONTINUED
-*/
-
-
-create trigger trigger_tempo_execucao
-ON faixa_playlist
-AFTER UPDATE, INSERT, DELETE
-AS 
-BEGIN
-declare @tempo_exec_playlist varchar(10)
-declare @tempo_exec_faixa varchar(10)
-
-
-declare @id_play int
-declare @id_faixa int
-
-
-select @id_play = id_playlist, @id_faixa = cod_faixa from inserted
-
-select @tempo_exec_playlist = tempo_exec from playlist
-where cod_playlist = @id_play
-
-select @tempo_exec_faixa  = tempo_execucao  from faixa
-where id_faixa  = @id_faixa
-
-declare @aux4  dec(6,2)
-declare @aux1 dec(6,2)
-declare @aux2 dec(6,2)
-declare @aux3 dec(6,2)
--------------------------------------------------------------
-select @aux1 = cast ( @tempo_exec_faixa as dec(6,2))
-
--- transforma em segundos o tempo da faixa
-select @aux2 = FLOOR(@aux1) * 60 + ( @aux1%floor(@aux1))*100
-
--------------------------------------------------------------
-
-select @aux3 = cast ( @tempo_exec_playlist as dec(6,2))
--- transforma em segundos o tempo da playlist
-select @aux4 = FLOOR(@aux3) * 60 + ( @aux3%floor(@aux3))*100
-
--- somando o tempo total:
-select @tempo_exec_playlist = cast((floor((@aux2 + @aux4 )/60) + (((@aux2 + @aux4)%60)/100)) as varchar(10))
-
-update playlist set tempo_exec = @tempo_exec_playlist 
-where cod_playlist = @id_play
-
-/*
-IF EXISTS (SELECT * FROM deleted)
-update playlist set tempo_exec = cast((floor((@aux2 - @aux4 )/60) + (((@aux2 - @aux4)%60)/100)) as varchar(10)) from deleted
-where cod_playlist = @id_play
-*/  
-END
-
-
-
 
 /*
 CORRIGIR
@@ -319,4 +259,151 @@ end
 
 
 
+	    set @tempo_exec_playlist = cast((cast(floor((@aux4 - @aux2 )/60) + 
+		(((@aux4 - @aux2)%60)/100)as dec(6,2)))  as varchar(10)) 
+PRINT @tempo_exec_playlist
 
+
+
+
+
+/*
+Gatilho para atualização do tempo de execução
+da playlist à medida que novas faixas são
+adicionadas:
+CORRIGIDO
+*/
+
+alter trigger trigger_tempo_execucao_incrementa
+ON faixa_playlist
+FOR UPDATE, INSERT
+AS 
+BEGIN
+declare @tempo_exec_playlist varchar(10)
+declare @tempo_exec_faixa varchar(10)
+
+
+declare @id_play int
+declare @id_faixa int
+
+declare @aux4  dec(6,2)
+declare @aux1 dec(6,2)
+declare @aux2 dec(6,2)
+declare @aux3 dec(6,2)
+
+DECLARE cursor_tempo_execucao CURSOR SCROLL FOR
+
+select id_playlist, cod_faixa from inserted
+
+OPEN cursor_tempo_execucao
+FETCH first FROM cursor_tempo_execucao
+
+INTO @id_play,  @id_faixa
+WHILE(@@FETCH_STATUS = 0)
+	BEGIN
+
+		select @tempo_exec_playlist = tempo_exec from playlist
+		where cod_playlist = @id_play
+
+		select @tempo_exec_faixa  = tempo_execucao  from faixa
+		where id_faixa  = @id_faixa
+
+		-------------------------------------------------------------
+		set @aux1 = cast ( @tempo_exec_faixa as dec(6,2))
+
+		-- transforma em segundos o tempo da faixa
+		set @aux2 = FLOOR(@aux1) * 60 + ( @aux1%floor(@aux1))*100
+
+		-------------------------------------------------------------
+ 
+		set @aux3 = cast ( @tempo_exec_playlist as dec(6,2))
+
+		if @aux3 != 0.0
+			BEGIN
+			-- transforma em segundos o tempo da playlist
+			set @aux4 = FLOOR(@aux3) * 60 + ( @aux3%floor(@aux3))*100
+			END
+		ELSE
+			BEGIN
+			  set @aux4 = @aux3
+			END
+
+
+		-- somando o tempo total:
+		set @tempo_exec_playlist = cast(cast((floor((@aux2 + @aux4 )/60) + (((@aux2 + @aux4)%60)/100)) as dec(6,2)) as varchar(10))
+
+		update playlist set tempo_exec = @tempo_exec_playlist 
+		where cod_playlist = @id_play
+
+		
+		FETCH NEXT FROM cursor_tempo_execucao
+		INTO @id_play,  @id_faixa
+	end
+	DEALLOCATE cursor_tempo_execucao
+
+END
+
+
+alter trigger trigger_tempo_execucao_decrementa
+ON faixa_playlist
+FOR UPDATE, DELETE
+AS 
+BEGIN
+declare @tempo_exec_playlist varchar(10)
+declare @tempo_exec_faixa varchar(10)
+
+
+declare @id_play int
+declare @id_faixa int
+
+declare @aux4  dec(6,2)
+declare @aux1 dec(6,2)
+declare @aux2 dec(6,2)
+declare @aux3 dec(6,2)
+
+
+DECLARE cursor_tempo_execucao_decrementa CURSOR SCROLL FOR
+
+select id_playlist, cod_faixa from deleted
+
+OPEN cursor_tempo_execucao_decrementa
+FETCH first FROM cursor_tempo_execucao_decrementa
+
+INTO @id_play,  @id_faixa
+WHILE(@@FETCH_STATUS = 0)
+	BEGIN
+
+		select @tempo_exec_playlist = tempo_exec from playlist
+		where cod_playlist = @id_play
+
+		select @tempo_exec_faixa  = tempo_execucao  from faixa
+		where id_faixa  = @id_faixa
+
+		-------------------------------------------------------------
+		set @aux1 = cast ( @tempo_exec_faixa as dec(6,2))
+
+		-- transforma em segundos o tempo da faixa
+		set @aux2 = FLOOR(@aux1) * 60 + ( @aux1%floor(@aux1))*100
+		
+	
+		-------------------------------------------------------------
+ 
+		set @aux3 = cast ( @tempo_exec_playlist as dec(6,2))
+		set @aux4 = FLOOR(@aux3) * 60 + ( @aux3%floor(@aux3))*100
+		
+
+	
+		    set @tempo_exec_playlist = cast((cast(floor((@aux4 - @aux2 )/60) + 
+		(((@aux4 - @aux2)%60)/100)as dec(6,2)))  as varchar(10)) 
+PRINT @tempo_exec_playlist
+
+		update playlist set tempo_exec = @tempo_exec_playlist 
+		where cod_playlist = @id_play
+		
+		
+          
+		FETCH NEXT FROM cursor_tempo_execucao_decrementa
+		INTO @id_play,  @id_faixa
+	end
+	DEALLOCATE cursor_tempo_execucao_decrementa
+END

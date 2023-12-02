@@ -72,7 +72,7 @@ as duas devem ser alocadas no filegroup (tablespace), definido com apenas um
 arquivo. As outras tabelas devem ser alocadas no filegroup com dois arquivos.
 
 3) Defina as seguintes restrições
-  [[ a) Um álbum, com faixas de músicas do período barroco, só pode ser inserido no
+  OK a) Um álbum, com faixas de músicas do período barroco, só pode ser inserido no
     banco de dados, caso o tipo de gravação seja DDD.
 
   OK b) Um álbum não pode ter mais que 64 faixas (músicas).
@@ -81,7 +81,7 @@ arquivo. As outras tabelas devem ser alocadas no filegroup com dois arquivos.
     devem ser removidas. Lembre-se que faixas podem apresentar, por sua vez,
     outros relacionamentos.
 
-  OK? d) O preço de compra de um álbum não dever ser superior a três vezes a média
+  OK d) O preço de compra de um álbum não dever ser superior a três vezes a média
     do preço de compra de álbuns, com todas as faixas com tipo de gravação
     DDD.
 

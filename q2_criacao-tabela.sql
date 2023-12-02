@@ -165,6 +165,11 @@ num_disco smallint,
 
 constraint PK_id_faixa_album primary key NONCLUSTERED (id_faixa),
 
+--caso algum erro ocorra relacionado a pk de faixa, se atentar a essa constraint
+CONSTRAINT un_num_faixa UNIQUE (id_faixa, num_faixa), 
+
+constraint CK_tempo_execucao CHECK (cast(tempo_execucao as dec(4,2))>0.0),
+
 constraint FK_cod_composicao foreign key(codigo_composicao) references composicao(cod_composicao)
 on delete no action on update cascade, 
 

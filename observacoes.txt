@@ -43,4 +43,5 @@ do preço de compra de álbuns, com todas as faixas com tipo de gravação
 DDD.
 
 11. Colocar número de faixa como unique para um 
-determinado álbym
+determinado álbum
+

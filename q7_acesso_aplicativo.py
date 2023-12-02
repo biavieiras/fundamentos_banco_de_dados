@@ -19,14 +19,29 @@
 import pyodbc
 #usar comando pip install pyodbc no terminal
 
-def conecta_ao_banco(driver='SQL Server Native Client 11.0', server='REVISION-PC\SQLEXPRESS', database='SpotPerTest', username=None, password=None, trusted_connection='yes'):
-    string_conexao = f"DRIVER={driver};SERVER={server};DATABASE={database};UID={username};PWD={password};TRUSTED_CONNECTION={trusted_connection}"
+driver='SQL Server' 
+server='DESKTOP-ELFS8LL\SQLEXPRESS'
+database='SpotPer'
+username=None
+password=None
+trusted_connection='yes'
 
-    conexao = pyodbc.connect(string_conexao)
-    cursor = conexao.cursor()
+string_conexao = f"DRIVER={driver};SERVER={server};DATABASE={database};
+UID={username};PWD={password};TRUSTED_CONNECTION={trusted_connection}"
 
-    return conexao, cursor
 
-conexao, cursor = conecta_ao_banco()
-print(cursor.execute('SELECT * from Compositor').fetchall())
+connection = pyodbc.connect(string_conexao)
+cursor = connection.cursor()
+
+query = 'SELECT * from Compositor'
+
+cursor.execute(query)
+
+rows = cursor.fetchall()
+
+for row in rows:
+    print(row);
+
+cursor.close();
+connection.close();
 
