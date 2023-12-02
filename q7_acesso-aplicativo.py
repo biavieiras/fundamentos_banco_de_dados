@@ -31,22 +31,28 @@ trusted_connection='yes'
 string_conexao = f"DRIVER={driver};SERVER={server};DATABASE={database};UID={username};PWD={password};TRUSTED_CONNECTION={trusted_connection}"
 
 
- #    a. Listar os álbuns com preço de compra maior que a média de preços de
-#       compra de todos os álbuns.
-    
 
+    
 
 connection = pyodbc.connect(string_conexao)
 cursor = connection.cursor()
 
-query = ' select a.nome,cast(a.pr_compra as float) from album a  where a.pr_compra> (select avg(a.pr_compra) from album a)'
+#    a. Listar os álbuns com preço de compra maior que a média de preços de
+#       compra de todos os álbuns.
+def listar_albuns(cursor):
+    query = 'select a.nome,cast(a.pr_compra as float) from album a  where a.pr_compra> (select avg(a.pr_compra) from album a)';
+    
+    cursor.execute(query);
+    
+    rows = cursor.fetchall();
+   
+    for row in rows:
+        print(row);
+    
+        
+listar_albuns(cursor);
 
-cursor.execute(query)
 
-rows = cursor.fetchall()
-
-for row in rows:
-    print(row);
 
 cursor.close();
 connection.close();
