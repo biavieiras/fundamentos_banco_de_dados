@@ -39,7 +39,7 @@ string_conexao = f"DRIVER={driver};SERVER={server};DATABASE={database};UID={user
 connection = pyodbc.connect(string_conexao)
 cursor = connection.cursor()
 
-query = ' select a.nome,a.pr_compra from album a  where a.pr_compra> (select avg(a.pr_compra) from album a)'
+query = ' select a.nome,cast(a.pr_compra as float) from album a  where a.pr_compra> (select avg(a.pr_compra) from album a)'
 
 cursor.execute(query)
 
