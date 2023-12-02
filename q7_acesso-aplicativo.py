@@ -1,3 +1,5 @@
+
+
 #7) Implemente um aplicativo Java, C ou Python, que implementa as seguintes
 #funcionalidades:
 #  (i) Criação de playlists no banco de dados. Esta função deve mostrar todos os
@@ -26,14 +28,18 @@ username=None
 password=None
 trusted_connection='yes'
 
-string_conexao = f"DRIVER={driver};SERVER={server};DATABASE={database};
-UID={username};PWD={password};TRUSTED_CONNECTION={trusted_connection}"
+string_conexao = f"DRIVER={driver};SERVER={server};DATABASE={database};UID={username};PWD={password};TRUSTED_CONNECTION={trusted_connection}"
+
+
+ #    a. Listar os álbuns com preço de compra maior que a média de preços de
+#       compra de todos os álbuns.
+    
 
 
 connection = pyodbc.connect(string_conexao)
 cursor = connection.cursor()
 
-query = 'SELECT * from Compositor'
+query = ' select a.nome,a.pr_compra from album a  where a.pr_compra> (select avg(a.pr_compra) from album a)'
 
 cursor.execute(query)
 

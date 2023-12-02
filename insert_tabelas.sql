@@ -166,11 +166,11 @@ insert into faixa values
 -------------------------------------------------------------------------------------------------------------------------------
 --Compositor:
 -- Inserindo dados na tabela compositor
-insert into compositor values 
+insert into compositos', '1990-12-03', NULL, 'Paris', 'França'),
+(434, 3, 'Isabel Rochor values 
 (678, 1, 'João Silva', '1980-05-15', NULL, 'Rio', 'Brasil'),
 (46, 2, 'Maria Oliveira', '1975-09-20', '2022-03-10', 'São Paulo', 'Brasil'),
-(34, 3, 'Antônio Santos', '1990-12-03', NULL, 'Paris', 'França'),
-(434, 3, 'Isabel Rocha', '1988-07-28', '2021-01-05', 'Salvador', 'Brasil'),
+(34, 3, 'Antônio Santa', '1988-07-28', '2021-01-05', 'Salvador', 'Brasil'),
 (80, 5, 'Pedro Costa', '1972-01-10', NULL, 'Recife', 'Brasil'),
 (67, 6, 'Ana Pereira', '1985-06-22', NULL, 'Porto ', 'Portugal'),
 (72, 3, 'Carlos Lima', '1995-11-17', NULL, 'Curitiba', 'Brasil'),
