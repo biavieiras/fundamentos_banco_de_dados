@@ -174,7 +174,8 @@ insert into compositor /*s', '1990-12-03', NULL, 'Paris', 'França'),
 (80, 5, 'Pedro Costa', '1972-01-10', NULL, 'Recife', 'Brasil'),
 (67, 6, 'Ana Pereira', '1985-06-22', NULL, 'Porto ', 'Portugal'),
 (72, 3, 'Carlos Lima', '1995-11-17', NULL, 'Curitiba', 'Brasil'),
-(88, 4, 'Marta Souza', '1982-04-12', '2020-08-08', 'Fortaleza', 'Brasil');
+(88, 4, 'Marta Souza', '1982-04-12', '2020-08-08', 'Fortaleza', 'Brasil'),
+(13, 5, 'Antonin Dvorak', '1841-09-08', '1904-05-01', null, 'Tchéquia')
 
 
 
@@ -187,6 +188,13 @@ insert into faixa_compositor values
 ( 53,88),
 ( 10,88)
 
+insert into faixa_compositor values
+(178, 34),
+( 256,46),
+( 53,67),
+( 64,72),
+( 34,80),
+( 41,88)
 
 -------------------------------------------------------------------------------------------------------------------------------
 -- playlist:
