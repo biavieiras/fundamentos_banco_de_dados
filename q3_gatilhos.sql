@@ -34,17 +34,6 @@ BEGIN
     ROLLBACK TRANSACTION
     END
   
-  ELSE
-	BEGIN
-	   IF EXISTS(SELECT * FROM DELETED)
-	       UPDATE faixa SET codigo_album = @cod_album
-		   where id_faixa = @cod_faixa
-
-       ELSE
-	       INSERT INTO faixa SELECT * FROM inserted
-
-     END
-   
 END
 
 
