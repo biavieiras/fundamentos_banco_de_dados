@@ -52,7 +52,15 @@ def listar_albuns(cursor):
         
 listar_albuns(cursor);
 
-
+'''def listar_albuns(cursor):
+    query = 'select a.nome,cast(a.pr_compra as float) from album a  where a.pr_compra> (select avg(a.pr_compra) from album a)';
+    
+    cursor.execute(query);
+    
+    rows = cursor.fetchall();
+   
+    for row in rows:
+        print(row);'''
 
 cursor.close();
 connection.close();

@@ -46,7 +46,7 @@ download, o tipo de gravação não terá valor algum.
 */
 
 
-alter trigger tipo_de_gravacao
+create trigger tipo_de_gravacao
 ON faixa
 FOR INSERT, UPDATE
 AS 
@@ -96,7 +96,7 @@ todas as faixas do gatilho devem ser do tipo DDD
   DDD.
   
 */
-ALTER trigger preco_compra_album
+create trigger preco_compra_album
 ON album
 FOR INSERT, UPDATE
 AS
@@ -216,7 +216,7 @@ gravação seja DDD.
 -- o ti
 
 
-alter trigger faixa_pm_barroco
+create trigger faixa_pm_barroco
 on faixa_compositor
 after update, insert
 as
@@ -263,7 +263,7 @@ adicionadas:
 CORRIGIDO
 */
 
-alter trigger trigger_tempo_execucao_incrementa
+create trigger trigger_tempo_execucao_incrementa
 ON faixa_playlist
 FOR UPDATE, INSERT
 AS 
@@ -333,7 +333,7 @@ WHILE(@@FETCH_STATUS = 0)
 END
 
 
-alter trigger trigger_tempo_execucao_decrementa
+create trigger trigger_tempo_execucao_decrementa
 ON faixa_playlist
 FOR UPDATE, DELETE
 AS 
