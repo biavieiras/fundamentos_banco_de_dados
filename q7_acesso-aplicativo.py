@@ -50,7 +50,7 @@ def listar_albuns(cursor):
         print(row);
     
         
-listar_albuns(cursor);
+#listar_albuns(cursor);
 
 
 #   b. Listar nome da gravadora com maior número de playlists que possuem
@@ -72,29 +72,64 @@ def listar_gravad_playlist(cursor):
     for row in rows:
         print(row);
 
-listar_gravad_playlist(cursor);
+#listar_gravad_playlist(cursor);
 
 
 #     c. Listar nome do compositor com maior número de faixas nas playlists
 #     existentes.
+"""
+alter procedure compositor_maior_n_playlists
+as
+Declare cursor_compositor_playlists Cursor Scroll for
+
+    select c.nome_compositor, count(*) as qtde from playlist p, faixa_playlist fp, faixa f, faixa_compositor fc, compositor c
+    where p.cod_playlist = fp.id_playlist and fp.cod_faixa = f.id_faixa and f.id_faixa = fc.cod_faixa
+	and fc.id_compositor = c.cod_compositor
+    group by c.nome_compositor
+	order by qtde desc
+declare @nome_compositor nvarchar(30), @qtde smallint
+OPEN cursor_compositor_playlists
+FETCH first from cursor_compositor_playlists
+INTO @nome_compositor, @qtde
+PRINT 'Nome Compositor: ' + @nome_compositor + ' - Qtde Faixas nas Playlist: ' +cast(@qtde as varchar(4))
+DEALLOCATE cursor_compositor_playlists
+
+EXEC compositor_maior_n_playlists
+"""
+
 def listar_comp_faixas(cursor):
-    query = ('select top 1 c.nome_compositor'
-    'from playlist p, faixa_playlist fp, faixa f, faixa_compositor fc, compositor c'
-    'where p.cod_playlist = fp.id_playlist and fp.cod_faixa = f.id_faixa and f.id_faixa = fc.cod_faixa' 
-	'and fc.id_compositor = c.cod_compositor'
-    'group by c.nome_compositor'
-    'order by count(distinct id_faixa) desc')
+    query = ('EXEC compositor_maior_n_playlists')
     
     cursor.execute(query);
     
-    rows = cursor.fetchall();
+    row = cursor.fetchone();
    
-    for row in rows:
-        print(row);
+   
+    print(row);
     
 listar_comp_faixas(cursor);
 
 
+#      d. Listar playlists, cujas faixas (todas) têm tipo de composição “Concerto” e
+#      período “Barroco”.
+
+# select distinct p.cod_playlist
+# from playlist p, faixa_playlist fp, faixa f, faixa_compositor fc, compositor c, periodo_musical pm, composicao cc
+# where p.cod_playlist = fp.id_playlist and fp.cod_faixa = f.id_faixa 
+# 	  and f.id_faixa = fc.cod_faixa and fc.id_compositor = c.cod_compositor
+# 	  and c.cod_periodo_mus = pm.cod_pm
+# 	  and cc.cod_composicao = f.codigo_composicao
+#       AND (cc.tipo_composicao LIKE '%_oncerto%' and pm.descricao_pm LIKE '%_arroco%')
+# 	  AND p.cod_playlist NOT in
+
+# 	  (select distinct p2.cod_playlist
+# 	  from playlist p2, faixa_playlist fp2, faixa f2, faixa_compositor fc2, compositor c2, periodo_musical pm2, composicao cc2
+# 	  where p2.cod_playlist = fp2.id_playlist and fp2.cod_faixa = f2.id_faixa 
+# 	  and f2.id_faixa = fc2.cod_faixa and fc2.id_compositor = c2.cod_compositor
+# 	  and c2.cod_periodo_mus = pm2.cod_pm
+# 	  and cc2.cod_composicao = f2.codigo_composicao      
+#       AND (cc2.tipo_composicao not LIKE '%_oncerto%' or pm2.descricao_pm not LIKE '%_arroco%')
+#   );
 
 cursor.close();
 connection.close();

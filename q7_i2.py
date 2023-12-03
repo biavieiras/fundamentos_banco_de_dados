@@ -1,3 +1,5 @@
+
+
 # 7) Implemente um aplicativo Java, C ou Python, que implementa as seguintes
 # funcionalidades:
 # (i) Criação de playlists no banco de dados. Esta função deve mostrar todos os
@@ -41,7 +43,7 @@ músicas existentes e a inserção de novas músicas na playlist escolhida
 def CustomPlaylist():
     while(True):
       
-      _ = os.system("cls")
+      #_ = os.system("cls")
       
       print("\nLista de Playlists: \n\n")
 
@@ -65,21 +67,26 @@ def CustomPlaylist():
         addP = input('\n O que deseja fazer?\n'
                    
                   '[d] Deletar Faixas \n'
-                  '[a] Adicionar Faixas\n' ) 
+                  '[a] Adicionar Faixas\n'
+                  '[s] Sair\n') 
       
       if (addP == 's'):
         break
       
       elif(addP =='a'):
-        AddPlaylist();     
+        AddPlaylist();  
+        
+      elif(addP == 'd'):
+          RemovePlaylist();     
 
 def AddPlaylist():    
     while(True):
         plAdd = input('Em qual Playlist você deseja adicionar as faixas?')
-        query1 = f"select p.cod_playlist from playlist p where p.nome_playlist = '{plAdd}'"
+        query1 = f"select p.cod_playlist from playlist p where p.nome_playlist ='{plAdd}'"
         cursor.execute(query1)
                 
         r = cursor.fetchone()
+        
         
         try:
                     
@@ -90,10 +97,40 @@ def AddPlaylist():
                 else:
                     
                     while(True):
-                        addFaixa = input('Qual faixa deseja adicionar: [c] para cancelar\n')
+                        print("\n Faixas disponíveis: \n\n")
+
+                        query_show = 'select f.descricao_faixa from  faixa f '
+                        cursor.execute(query_show)
+
+                        rows = cursor.fetchall()
+                        for row in rows:
+                                print(f"{row[0]} \n") 
+                        
+                        
+                        print(f'\nFaixas da Playlist {plAdd}:\n')
+                        
+                        query25 = f'select f.descricao_faixa from playlist p, faixa_playlist fp, faixa f where f.id_faixa = fp.cod_faixa and fp.id_playlist = p.cod_playlist  and p.cod_playlist = {r[0]}'
+                        cursor.rollback()
+                        cursor.execute(query25)
+                        
+                        rows = cursor.fetchall()
+                        
+                        count = 1
+                        for row in rows:
+                            
+                          print(f'{count} - {row[0]} \n')
+                          count += 1 
+                          
+                        cursor.rollback()  
+                        
+                                 
+                        addFaixa = input('Qual faixa deseja adicionar: [c] para cancelar: \n')
                        
                         if(addFaixa =='c'): break;
                         
+                        
+                        
+                                            
                         query1 = f"select id_faixa from faixa where descricao_faixa = '{addFaixa}'"
                         cursor.execute(query1)
                         
@@ -114,12 +151,12 @@ def AddPlaylist():
                                 
                                 
                         except pyodbc.DatabaseError as e : 
-                                print('Nome não encontrado, por favor, digite novamente\n')
+                                print(e,'\n')
                         
                         finally:
                             ish = input(' Quer continuar adicionando faixas à Playlist?'
-                                        '[s] - sim'
-                                        '[n] - nao')
+                                        '[s] - sim\n'
+                                        '[n] - nao\n')
                             if(ish != 's'):
                                 break;
                     
@@ -127,11 +164,83 @@ def AddPlaylist():
                         
                         
         except pyodbc.DatabaseError as e : 
-                    print('Nome não encontrado, por favor, digite novamente\n')
+                    print(e,'\n')
             
         break;
         
            
+def RemovePlaylist():
+    while(True):
+        plRem = input('Em qual Playlist você deseja remover as faixas?')
+        query1 = f"select p.cod_playlist from playlist p where p.nome_playlist ='{plRem}'"
+        cursor.execute(query1)
+                
+        r = cursor.fetchone()
+        
+        
+        try:
+                    
+                if ( isinstance(r, type(None))):
+                    
+                    print('Nome não encontrado, por favor, digite novamente.\n')
+            
+                else:
+                    
+                    while(True):
+                        print(f'Faixas da Playlist {plRem}:\n')
+                        
+                        query25 = f'select f.descricao_faixa from playlist p, faixa_playlist fp, faixa f where f.id_faixa = fp.cod_faixa and fp.id_playlist = p.cod_playlist  and p.cod_playlist = {r[0]}'
+                        cursor.rollback()
+                        cursor.execute(query25)
+                        
+                        rows = cursor.fetchall()
+                        
+                        count = 1
+                        for row in rows:
+                            
+                          print(f'{count} - {row[0]} \n')
+                          count += 1 
+                          
+                        remFaixa = input('Qual faixa você deseja remover: [c] para cancelar: \n')
+                       
+                        if(remFaixa =='c'): break;
+                        
+                        query1 = f"select id_faixa from faixa where descricao_faixa ='{remFaixa}'"
+                        cursor.execute(query1)
+                        
+                        l = cursor.fetchone()
+                                       
+                        try:
+                            
+                            if ( isinstance(l, type(None))):
+                                
+                                print('Nome não encontrado, por favor, digite novamente.\n')
+                        
+                            else:
+                            
+                                query2 = f'delete from faixa_playlist where id_playlist={r[0]} and  cod_faixa = {l[0]}'
+                                cursor.execute(query2);
+                                connection.commit()
+                                print('Faixa Removida com sucesso :D')
+                                
+                                
+                        except pyodbc.DatabaseError as e : 
+                                print(e)
+                        
+                        finally:
+                            ish = input(' Quer continuar removendo faixas à Playlist?'
+                                        '[s] - sim\n'
+                                        '[n] - nao\n')
+                            if(ish != 's'):
+                                break;
+                    
+                        
+                        
+                        
+        except pyodbc.DatabaseError as e : 
+                    print(e)
+            
+        break;
         
             
   
