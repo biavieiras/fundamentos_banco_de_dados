@@ -248,12 +248,6 @@ end
 
 
 
-	    set @tempo_exec_playlist = cast((cast(floor((@aux4 - @aux2 )/60) + 
-		(((@aux4 - @aux2)%60)/100)as dec(6,2)))  as varchar(10)) 
-PRINT @tempo_exec_playlist
-
-
-
 
 
 /*

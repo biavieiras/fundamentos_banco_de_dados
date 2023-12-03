@@ -4,10 +4,12 @@ FUNCIONANDO !!
 nome do compositor e o parâmetro de saída todos os álbuns com obras
 compostas pelo compositor.
 */
+
+  
 create function albuns_com_obras_compositor
 (@nome_compositor nvarchar(50))
 returns @tab_result table
-(nome_album nvarchar(50), nome_faixa nvarchar(30))
+(cod_compositor smallint,nome_album nvarchar(50), nome_faixa nvarchar(100))
 
 as
 begin
@@ -16,9 +18,14 @@ declare @nome_comp nvarchar(50)
 begin
    insert into @tab_result
 
-   select a.nome,f.descricao_faixa  from album a, faixa f, faixa_compositor fc, compositor c
-   where a.cod_album = f.codigo_album and f.id_faixa = fc.cod_faixa and fc.id_compositor = c.cod_compositor
-   and c.nome_compositor like @nome_comp
+   select c.cod_compositor,isnull(a.nome,0),isnull(f.descricao_faixa ,0) from album a 
+   right join faixa f on a.cod_album = f.codigo_album
+right join  faixa_compositor fc on f.id_faixa = fc.cod_faixa 
+right join compositor c 
+on fc.id_compositor = c.cod_compositor
+  where  c.nome_compositor like @nome_comp
 end
 return
 end
+
+select * from albuns_com_obras_compositor('%GUI%')
