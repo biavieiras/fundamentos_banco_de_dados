@@ -15,7 +15,7 @@
 #         pelo uma faixa composta pelo compositor Dvorack.
 #      OK c. Listar nome do compositor com maior número de faixas nas playlists
 #         existentes.
-#      d. Listar playlists, cujas faixas (todas) têm tipo de composição “Concerto” e
+#      OK d. Listar playlists, cujas faixas (todas) têm tipo de composição “Concerto” e
 #      período “Barroco”.
 
 # Executar o comando python -u "d:\Documentos_Importantes\UFC\4º_semestre\Fundamento de Banco de Dados\Trab_2_FBD\fundamentos_banco_de_dados\q7_acesso-aplicativo.py"
@@ -128,26 +128,40 @@ listar_comp_faixas(cursor);
 
 
 
-#      d. Listar playlists, cujas faixas (todas) têm tipo de composição “Concerto” e
-#      período “Barroco”.
+#    d. Listar playlists, cujas faixas (todas) têm tipo de composição “Concerto” e
+#    período “Barroco”.
 
-# select distinct p.cod_playlist
-# from playlist p, faixa_playlist fp, faixa f, faixa_compositor fc, compositor c, periodo_musical pm, composicao cc
-# where p.cod_playlist = fp.id_playlist and fp.cod_faixa = f.id_faixa 
-# 	  and f.id_faixa = fc.cod_faixa and fc.id_compositor = c.cod_compositor
-# 	  and c.cod_periodo_mus = pm.cod_pm
-# 	  and cc.cod_composicao = f.codigo_composicao
-#       AND (cc.tipo_composicao LIKE '%_oncerto%' and pm.descricao_pm LIKE '%_arroco%')
-# 	  AND p.cod_playlist NOT in
+def playlists_barroco_concerto(cursor):
+    query = ('(select distinct p.cod_playlist, p.nome_playlist'
+    'from playlist p'
+    'where not exists( '
+	'select p2.cod_playlist'
+    'from playlist p2, faixa_playlist fp, faixa f, faixa_compositor fc, compositor c, periodo_musical pm, composicao cc'
+	'where p.cod_playlist = fp.id_playlist and fp.cod_faixa = f.id_faixa '
+	'and f.id_faixa = fc.cod_faixa and fc.id_compositor = c.cod_compositor'
+	'and c.cod_periodo_mus = pm.cod_pm'
+	'and cc.cod_composicao = f.codigo_composicao'
+	"AND (cc.tipo_composicao not LIKE '%_oncerto%' or pm.descricao_pm not LIKE '%_arroco%')))"
+'EXCEPT' 
+'(select distinct p.cod_playlist, p.nome_playlist'
+'from playlist p, faixa_playlist fp, faixa f, faixa_compositor fc, compositor c, periodo_musical pm, composicao cc'
+'where p.cod_playlist = fp.id_playlist and fp.cod_faixa = f.id_faixa '
+	  'and cc.cod_composicao = f.codigo_composicao'
+	  'and f.id_faixa in --faixas que nao estao associadas a nenhum compositor'
+	  '(select f2.id_faixa from faixa f2'
+	   'except'
+	   'select fc2.cod_faixa from faixa_compositor fc2)));')
+    
+    cursor.execute(query);
+    
+    rows = cursor.fetchall();
+   
+    for row in rows:
+        print(f"Código da playlist: {row[0]}  :: Nome da PLaylist: {row[1]}");
+    
+        
+playlists_barroco_concerto(cursor);
 
-# 	  (select distinct p2.cod_playlist
-# 	  from playlist p2, faixa_playlist fp2, faixa f2, faixa_compositor fc2, compositor c2, periodo_musical pm2, composicao cc2
-# 	  where p2.cod_playlist = fp2.id_playlist and fp2.cod_faixa = f2.id_faixa 
-# 	  and f2.id_faixa = fc2.cod_faixa and fc2.id_compositor = c2.cod_compositor
-# 	  and c2.cod_periodo_mus = pm2.cod_pm
-# 	  and cc2.cod_composicao = f2.codigo_composicao      
-#       AND (cc2.tipo_composicao not LIKE '%_oncerto%' or pm2.descricao_pm not LIKE '%_arroco%')
-#   );
 
 cursor.close();
 connection.close();
