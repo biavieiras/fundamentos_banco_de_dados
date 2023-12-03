@@ -142,7 +142,7 @@ def CustomPlaylist():
       rows = cursor.fetchall()
        
       for row in rows:
-                print(f"{row[0]} - {row[1]} minutos\n")
+                print(f"{row[0]} :: {row[1]} minutos\n")
 
       
       addP = input('\n O que deseja fazer?\n'
