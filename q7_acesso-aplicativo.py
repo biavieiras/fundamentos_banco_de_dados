@@ -22,7 +22,7 @@ import pyodbc
 #usar comando pip install pyodbc no terminal
 
 driver='SQL Server' 
-server='DESKTOP-ELFS8LL'
+server='DESKTOP-ELFS8LL\SQLEXPRESS'
 database='SpotPer'
 username=None
 password=None
@@ -77,6 +77,8 @@ def listar_gravad_playlist(cursor):
 
 #     c. Listar nome do compositor com maior número de faixas nas playlists
 #     existentes.
+
+
 """
 alter procedure compositor_maior_n_playlists
 as
@@ -87,27 +89,27 @@ Declare cursor_compositor_playlists Cursor Scroll for
 	and fc.id_compositor = c.cod_compositor
     group by c.nome_compositor
 	order by qtde desc
-declare @nome_compositor nvarchar(30), @qtde smallint
 OPEN cursor_compositor_playlists
 FETCH first from cursor_compositor_playlists
-INTO @nome_compositor, @qtde
-PRINT 'Nome Compositor: ' + @nome_compositor + ' - Qtde Faixas nas Playlist: ' +cast(@qtde as varchar(4))
 DEALLOCATE cursor_compositor_playlists
 
 EXEC compositor_maior_n_playlists
+
 """
 
 def listar_comp_faixas(cursor):
-    query = ('EXEC compositor_maior_n_playlists')
+    query = ("EXEC compositor_maior_n_playlists")
     
-    cursor.execute(query);
+    cursor.execute(query)
+    rows =cursor.fetchone()
+    print(rows)
     
-    row = cursor.fetchone();
    
-   
-    print(row);
+    
     
 listar_comp_faixas(cursor);
+
+
 
 
 #      d. Listar playlists, cujas faixas (todas) têm tipo de composição “Concerto” e
