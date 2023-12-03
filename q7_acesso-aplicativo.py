@@ -59,7 +59,7 @@ listar_albuns(cursor);
 #   b. Listar nome da gravadora com maior número de playlists que possuem
 #   pelo uma faixa composta pelo compositor Dvorack.
 """
-    create procedure gravador_maior_n_playlists
+   create procedure gravador_maior_n_playlists
 as
 Declare cursor_gravadora_playlists Cursor Scroll for
     select  g.nome, COUNT(DISTINCT p.cod_playlist)
@@ -86,6 +86,9 @@ def listar_gravad_playlist(cursor):
     print(f"Nome Gravadora: {row[0]} :: Número de Playlists: {row[1]}");
 
 listar_gravad_playlist(cursor);
+
+
+
 
 
 #     c. Listar nome do compositor com maior número de faixas nas playlists
@@ -116,7 +119,7 @@ def listar_comp_faixas(cursor):
     cursor.execute(query)
     row =cursor.fetchone()
     print(f"Nome do compositor: {row[0]} :: Número de faixas: {row[1]}")
-    
+     
    
     
     
