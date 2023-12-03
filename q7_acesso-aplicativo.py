@@ -120,23 +120,69 @@ def listar_comp_faixas(cursor):
     row =cursor.fetchone()
     print(f"Nome do compositor: {row[0]} :: Número de faixas: {row[1]}")
      
-   
     
     
 listar_comp_faixas(cursor);
 
 
 
-
 #    d. Listar playlists, cujas faixas (todas) têm tipo de composição “Concerto” e
 #    período “Barroco”.
 
+
 def playlists_barroco_concerto(cursor):
+    query =(
+        
+        """
+select p.cod_playlist ,p.nome_playlist from playlist p, faixa_playlist fp, faixa f, faixa_compositor fc, 
+compositor c, periodo_musical pm
+where p.cod_playlist = fp.id_playlist and fp.cod_faixa = f.id_faixa and
+ f.id_faixa = fc.cod_faixa and fc.id_compositor = c.cod_compositor and
+c.cod_periodo_mus = pm.cod_pm
+except
+select p.cod_playlist ,p.nome_playlist from playlist p, faixa_playlist fp, faixa f, faixa_compositor fc, 
+compositor c, periodo_musical pm, composicao cc
+where p.cod_playlist = fp.id_playlist and fp.cod_faixa = f.id_faixa and
+ f.id_faixa = fc.cod_faixa and fc.id_compositor = c.cod_compositor and
+c.cod_periodo_mus = pm.cod_pm and f.codigo_composicao = cc.cod_composicao
+ and pm.descricao_pm in (select pm.descricao_pm from periodo_musical pm where pm.descricao_pm!='barroco')
+ except
+ select  p.cod_playlist ,p.nome_playlist from playlist p, faixa_playlist fp, faixa f, faixa_compositor fc, 
+compositor c, periodo_musical pm, composicao cc
+where p.cod_playlist = fp.id_playlist and fp.cod_faixa = f.id_faixa and
+ f.id_faixa = fc.cod_faixa and fc.id_compositor = c.cod_compositor and
+c.cod_periodo_mus = pm.cod_pm and f.codigo_composicao = cc.cod_composicao and
+ f.codigo_composicao in (select cc.cod_composicao from composicao cc where tipo_composicao!='concerto')
+"""
+    ) 
+    
+    cursor.execute(query);
+    
+    rows = cursor.fetchall();
+   
+    for row in rows:
+        print(f"Código da playlist: {row[0]}  :: Nome da PLaylist: {row[1]}");
+    
+
+
+        
+playlists_barroco_concerto(cursor);
+
+
+cursor.close();
+connection.close();
+
+
+
+
+
+"""
+    def playlists_barroco_concerto(cursor):
     query = ('(select distinct p.cod_playlist, p.nome_playlist'
-    'from playlist p'
+    'from playlist p '
     'where not exists( '
 	'select p2.cod_playlist'
-    'from playlist p2, faixa_playlist fp, faixa f, faixa_compositor fc, compositor c, periodo_musical pm, composicao cc'
+    'from playlist p2, faixa_playlist fp, faixa f, faixa_compositor fc, compositor c, periodo_musical pm, composicao cc '
 	'where p.cod_playlist = fp.id_playlist and fp.cod_faixa = f.id_faixa '
 	'and f.id_faixa = fc.cod_faixa and fc.id_compositor = c.cod_compositor'
 	'and c.cod_periodo_mus = pm.cod_pm'
@@ -144,7 +190,7 @@ def playlists_barroco_concerto(cursor):
 	"AND (cc.tipo_composicao not LIKE '%_oncerto%' or pm.descricao_pm not LIKE '%_arroco%')))"
 'EXCEPT' 
 '(select distinct p.cod_playlist, p.nome_playlist'
-'from playlist p, faixa_playlist fp, faixa f, faixa_compositor fc, compositor c, periodo_musical pm, composicao cc'
+'from playlist p, faixa_playlist fp, faixa f, faixa_compositor fc, compositor c, periodo_musical pm, composicao cc '
 'where p.cod_playlist = fp.id_playlist and fp.cod_faixa = f.id_faixa '
 	  'and cc.cod_composicao = f.codigo_composicao'
 	  'and f.id_faixa in --faixas que nao estao associadas a nenhum compositor'
@@ -159,12 +205,13 @@ def playlists_barroco_concerto(cursor):
     for row in rows:
         print(f"Código da playlist: {row[0]}  :: Nome da PLaylist: {row[1]}");
     
+"""
+
         
-playlists_barroco_concerto(cursor);
+#playlists_barroco_concerto(cursor);
 
 
-cursor.close();
-connection.close();
+
 
 #Se a consulta estiver mudando algo no banco (adc tupla, altera tabela, etc.), deve-se usar o comando cursor.commit()
 #Exemplo:
