@@ -4,6 +4,9 @@
 # álbuns existentes. O usuário pode, assim, escolher o(s) álbum(ns) e quais
 # faixas destes que devem compor a playlist.
 
+# python -u "d:\Documentos_Importantes\UFC\4º_semestre\Fundamento de Banco de Dados\Trab_2_FBD\fundamentos_banco_de_dados\q7_item_i_ii.py"
+
+
 
 import pyodbc
 import random
@@ -12,8 +15,8 @@ import os
 #usar comando pip install pyodbc no terminal
 
 driver='SQL Server' 
-#server='DESKTOP-ELFS8LL\SQLEXPRESS'
-server= 'DESKTOP-4TLSHUG'
+server='DESKTOP-ELFS8LL\SQLEXPRESS'
+#server= 'DESKTOP-4TLSHUG'
 database='SpotPer'
 username=None
 password=None
@@ -25,34 +28,15 @@ string_conexao = f"DRIVER={driver};SERVER={server};DATABASE={database};UID={user
 connection = pyodbc.connect(string_conexao)
 cursor = connection.cursor()
 
-def queries(cursor):
-  # Para fazer insert ou update
-  
-  cursor.executemany()
 
-  try:
-      query = 'select a.nome,cast(a.pr_compra as float) from album a  where a.pr_compra> (select avg(a.pr_compra) from album a)';
-      
-      cursor.execute(query);
-      connection.commit();
-      
-  except pyodbc.DatabaseError as e:
-    print(e)
-  # No caso de algum erro usar um try e um rollback:
-    connection.rollback()
-
-  finally:
-    connection.close()
-
-
-def criaAlbum():
+def criaPlaylist():
   while(True):
     _ = os.system('cls')
     create = input("Deseja criar uma nova playlist? 's' para sim, 'n' para nao. \n")
     
     if(create !='s' and create !='n'):
             print('Comando não reconhecido.\n')
-            return criaAlbum();
+            return criaPlaylist();
     if(create =='n'):
        break;
     
@@ -135,16 +119,19 @@ def criaAlbum():
                         print('Nome não encontrado, por favor, digite novamente\n')
                 
                 break;
+  
       
+
       
      
-criaAlbum()
+criaPlaylist()
 
 
+cursor.close()
       
+connection.close()
 
 
-          
     
     
       

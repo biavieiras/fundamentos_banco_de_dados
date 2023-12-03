@@ -24,3 +24,19 @@ as
 CREATE UNIQUE CLUSTERED INDEX I_playlist_qtde_albuns ON playlist_qtde_albuns (nome_playlist)
 
 select * from playlist_qtde_albuns
+
+
+
+alter view playlist_qtde_albuns(nome_playlist, qtde_albuns)
+with schemabinding
+as
+   select nome_playlist,Isnull(count(fp.id_playlist),0)as 'qtde albuns' from dbo.playlist p left   join
+    dbo.faixa_playlist fp on cod_playlist = id_playlist
+		left   join
+ dbo.faixa f on cod_faixa = f.id_faixa
+ left join
+   dbo.album a on
+   f.codigo_album = a.cod_album
+   group by p.cod_playlist,nome_playlist, fp.id_playlist
+
+CREATE UNIQUE CLUSTERED INDEX I_playlist_qtde_albuns ON playlist_qtde_albuns (nome_playlist)
