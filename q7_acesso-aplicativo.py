@@ -59,7 +59,7 @@ listar_albuns(cursor);
 #   b. Listar nome da gravadora com maior número de playlists que possuem
 #   pelo uma faixa composta pelo compositor Dvorack.
 """
-   create procedure gravador_maior_n_playlists
+ create procedure gravador_maior_n_playlists
 as
 Declare cursor_gravadora_playlists Cursor Scroll for
     select  g.nome, COUNT(DISTINCT p.cod_playlist)
@@ -71,23 +71,47 @@ Declare cursor_gravadora_playlists Cursor Scroll for
     GROUP BY g.cod_gravad, g.nome
     ORDER BY COUNT(DISTINCT p.cod_playlist) DESC
 OPEN cursor_gravadora_playlists
+declare @nome nvarchar(30), @qtde smallint, @aux smallint
 FETCH first from cursor_gravadora_playlists
+into
+@nome, @qtde
+set @aux = @qtde
+
+FETCH first from cursor_gravadora_playlists
+WHILE(@@FETCH_STATUS = 0 )
+BEGIN
+
+FETCH next from cursor_gravadora_playlists
+into
+@nome, @qtde
+if @qtde = @aux
+FETCH next from cursor_gravadora_playlists
+end
+
 DEALLOCATE cursor_gravadora_playlists
 """
 
-
+    
 def listar_gravad_playlist(cursor):
     query = ('exec gravador_maior_n_playlists')
-    
-    cursor.execute(query);
-    
-    row = cursor.fetchone();
-   
-    print(f"Nome Gravadora: {row[0]} :: Número de Playlists: {row[1]}");
+    aux = True
+    cursor.execute(query)
+    while(True):
+     try: 
+      row = cursor.fetchone();
+      
+      if(isinstance(row, type(None))):
+         break 
+      else:  
+        
+        print(f"Nome Gravadora: {row[0]} :: Número de Playlists: {row[1]}");
+        
+        cursor.nextset()
+     except:
+       break
+
 
 listar_gravad_playlist(cursor);
-
-
 
 
 
@@ -111,7 +135,7 @@ DEALLOCATE cursor_compositor_playlists
 
 EXEC compositor_maior_n_playlists
 
-"""
+
 
 def listar_comp_faixas(cursor):
     query = ("EXEC compositor_maior_n_playlists")
@@ -122,9 +146,29 @@ def listar_comp_faixas(cursor):
      
     
     
+
+"""
+ 
+ 
+def listar_comp_faixas(cursor):
+    query = ("EXEC compositor_maior_n_playlists")
+    
+    cursor.execute(query)
+    while(True):
+     try: 
+      row = cursor.fetchone();
+      
+      if(isinstance(row, type(None))):
+         break 
+      else:  
+        
+        
+        print(f"Nome do compositor: {row[0]} :: Número de faixas: {row[1]}")
+        cursor.nextset()
+     except:
+       break
+    
 listar_comp_faixas(cursor);
-
-
 
 #    d. Listar playlists, cujas faixas (todas) têm tipo de composição “Concerto” e
 #    período “Barroco”.
