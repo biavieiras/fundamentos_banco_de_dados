@@ -15,8 +15,9 @@ import os
 #usar comando pip install pyodbc no terminal
 
 driver='SQL Server' 
-server='DESKTOP-ELFS8LL\SQLEXPRESS'
-#server= 'DESKTOP-4TLSHUG'
+#server='DESKTOP-ELFS8LL\SQLEXPRESS'
+server= 'DESKTOP-4TLSHUG'
+#server= 'Revision-PC'
 database='SpotPer'
 username=None
 password=None
@@ -86,7 +87,7 @@ def criaPlaylist():
         while(adiciona!= 's' and adiciona != 'n' ):
             print('Entrada inválida, digite novamente.')
             
-            adiciona = input('Deseja adicionar faixas ao álbum? "s" para sim "n" para não: \n')          
+            adiciona = input('Deseja adicionar faixas à playlist? "s" para sim "n" para não: \n')          
         
         if(adiciona == 'n'):
             break;
@@ -166,7 +167,7 @@ def CustomPlaylist():
         AddPlaylist();  
         
       elif(addP == 'd'):
-          RemovePlaylist();     
+        RemovePlaylist();     
 
 def AddPlaylist():    
     while(True):
