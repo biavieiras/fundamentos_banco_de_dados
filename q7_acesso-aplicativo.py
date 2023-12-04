@@ -59,7 +59,7 @@ listar_albuns(cursor);
 #   b. Listar nome da gravadora com maior número de playlists que possuem
 #   pelo uma faixa composta pelo compositor Dvorack.
 """
-   create procedure gravador_maior_n_playlists
+ create procedure gravador_maior_n_playlists
 as
 Declare cursor_gravadora_playlists Cursor Scroll for
     select  g.nome, COUNT(DISTINCT p.cod_playlist)
@@ -71,23 +71,47 @@ Declare cursor_gravadora_playlists Cursor Scroll for
     GROUP BY g.cod_gravad, g.nome
     ORDER BY COUNT(DISTINCT p.cod_playlist) DESC
 OPEN cursor_gravadora_playlists
+declare @nome nvarchar(30), @qtde smallint, @aux smallint
 FETCH first from cursor_gravadora_playlists
+into
+@nome, @qtde
+set @aux = @qtde
+
+FETCH first from cursor_gravadora_playlists
+WHILE(@@FETCH_STATUS = 0 )
+BEGIN
+
+FETCH next from cursor_gravadora_playlists
+into
+@nome, @qtde
+if @qtde = @aux
+FETCH next from cursor_gravadora_playlists
+end
+
 DEALLOCATE cursor_gravadora_playlists
 """
 
-
+    
 def listar_gravad_playlist(cursor):
     query = ('exec gravador_maior_n_playlists')
-    
-    cursor.execute(query);
-    
-    row = cursor.fetchone();
-   
-    print(f"Nome Gravadora: {row[0]} :: Número de Playlists: {row[1]}");
+    aux = True
+    cursor.execute(query)
+    while(True):
+     try: 
+      row = cursor.fetchone();
+      
+      if(isinstance(row, type(None))):
+         break 
+      else:  
+        
+        print(f"Nome Gravadora: {row[0]} :: Número de Playlists: {row[1]}");
+        
+        cursor.nextset()
+     except:
+       break
+
 
 listar_gravad_playlist(cursor);
-
-
 
 
 
@@ -96,35 +120,57 @@ listar_gravad_playlist(cursor);
 
 
 """
-alter procedure compositor_maior_n_playlists
+
+create procedure compositor_maior_n_playlists
 as
 Declare cursor_compositor_playlists Cursor Scroll for
-
-    select c.nome_compositor, count(*) as qtde from playlist p, faixa_playlist fp, faixa f, faixa_compositor fc, compositor c
+select c.nome_compositor, count(*) as qtde from playlist p, faixa_playlist fp, faixa f, faixa_compositor fc, compositor c
     where p.cod_playlist = fp.id_playlist and fp.cod_faixa = f.id_faixa and f.id_faixa = fc.cod_faixa
 	and fc.id_compositor = c.cod_compositor
     group by c.nome_compositor
 	order by qtde desc
-OPEN cursor_compositor_playlists
-FETCH first from cursor_compositor_playlists
-DEALLOCATE cursor_compositor_playlists
+OPEN cursor_compositor_playlists 
+declare @nome nvarchar(30), @qtde smallint, @aux smallint
+FETCH first from cursor_compositor_playlists 
+into
+@nome, @qtde
+set @aux = @qtde
 
-EXEC compositor_maior_n_playlists
+FETCH first from cursor_compositor_playlists 
+WHILE(@@FETCH_STATUS = 0 )
+BEGIN
+
+FETCH next from cursor_compositor_playlists 
+into
+@nome, @qtde
+if @qtde = @aux
+FETCH next from cursor_compositor_playlists 
+end
+
+DEALLOCATE cursor_compositor_playlists 
 
 """
-
+ 
+ 
 def listar_comp_faixas(cursor):
     query = ("EXEC compositor_maior_n_playlists")
     
     cursor.execute(query)
-    row =cursor.fetchone()
-    print(f"Nome do compositor: {row[0]} :: Número de faixas: {row[1]}")
-     
-    
+    while(True):
+     try: 
+      row = cursor.fetchone();
+      
+      if(isinstance(row, type(None))):
+         break 
+      else:  
+        
+        
+        print(f"Nome do compositor: {row[0]} :: Número de faixas: {row[1]}")
+        cursor.nextset()
+     except:
+       break
     
 listar_comp_faixas(cursor);
-
-
 
 #    d. Listar playlists, cujas faixas (todas) têm tipo de composição “Concerto” e
 #    período “Barroco”.
